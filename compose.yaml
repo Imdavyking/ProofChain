@@ -1,0 +1,150 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - 3100:3100
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+    secrets:
+      - TWITTER_CONSUMER_KEY
+      - TWITTER_CONSUMER_SECRET
+      - TWITTER_ACCESS_TOKEN
+      - TWITTER_ACCESS_TOKEN_SECRET
+      - TWITTER_USER_ID
+      - TWITTER_BEARER_TOKEN
+      - NODE_ENV
+      - OPENAI_API_KEY
+      - JWT_SECRET
+      - PORT
+      - CHAIN_ID
+      - RPC_URL
+      - CONTRACT_ADDRESS
+      - API_SCAN_VERIFIER_KEY
+      - MONGO_URI
+      - REDIS_HOST
+      - REDIS_PORT
+      - REDIS_PASSWORD
+      - KEYSTORE_FILE
+      - KEYSTORE_PASSWORD
+      - API_BROWSER_URL
+      - COINGECKO_DEMO_API_KEY
+      - PINATA_JWT
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/ai-bot}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - FRONTEND_URL=http://localhost:3000
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+    env_file:
+      - ./frontend/.env
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis-data:/data
+
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    networks:
+      - app-network
+    volumes:
+      - mongodb-data:/data/db
+    command: mongod --quiet --logpath /dev/null
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
+
+secrets:
+  MONGO_URI:
+    file: ./backend/secrets/MONGO_URI
+  TWITTER_CONSUMER_KEY:
+    file: ./backend/secrets/TWITTER_CONSUMER_KEY
+  TWITTER_CONSUMER_SECRET:
+    file: ./backend/secrets/TWITTER_CONSUMER_SECRET
+  TWITTER_ACCESS_TOKEN:
+    file: ./backend/secrets/TWITTER_ACCESS_TOKEN
+  TWITTER_ACCESS_TOKEN_SECRET:
+    file: ./backend/secrets/TWITTER_ACCESS_TOKEN_SECRET
+  TWITTER_USER_ID:
+    file: ./backend/secrets/TWITTER_USER_ID
+  TWITTER_BEARER_TOKEN:
+    file: ./backend/secrets/TWITTER_BEARER_TOKEN
+  REDIS_HOST:
+    file: ./backend/secrets/REDIS_HOST
+  REDIS_PORT:
+    file: ./backend/secrets/REDIS_PORT
+  REDIS_PASSWORD:
+    file: ./backend/secrets/REDIS_PASSWORD
+  NODE_ENV:
+    file: ./backend/secrets/NODE_ENV
+  OPENAI_API_KEY:
+    file: ./backend/secrets/OPENAI_API_KEY
+  JWT_SECRET:
+    file: ./backend/secrets/JWT_SECRET
+  PORT:
+    file: ./backend/secrets/PORT
+  FRONTEND_URL:
+    file: ./backend/secrets/FRONTEND_URL
+  CHAIN_ID:
+    file: ./backend/secrets/CHAIN_ID
+  RPC_URL:
+    file: ./backend/secrets/RPC_URL
+  CONTRACT_ADDRESS:
+    file: ./backend/secrets/CONTRACT_ADDRESS
+  API_SCAN_VERIFIER_KEY:
+    file: ./backend/secrets/API_SCAN_VERIFIER_KEY
+  KEYSTORE_FILE:
+    file: ./backend/secrets/KEYSTORE_FILE
+  KEYSTORE_PASSWORD:
+    file: ./backend/secrets/KEYSTORE_PASSWORD
+  COINGECKO_DEMO_API_KEY:
+    file: ./backend/secrets/COINGECKO_DEMO_API_KEY
+  PINATA_JWT:
+    file: ./backend/secrets/PINATA_JWT
+  API_BROWSER_URL:
+    file: ./backend/secrets/API_BROWSER_URL
+
+volumes:
+  mongodb-data:
+  redis-data:

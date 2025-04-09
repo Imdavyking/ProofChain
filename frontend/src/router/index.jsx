@@ -1,7 +1,8 @@
 import { useRoutes } from "react-router-dom";
-import Home from "../views/home/home";
-import GetStarted from "../views/get-stated/get-stated";
-import NotFound from "../views/not-found/Main";
+import Home from "../views/home/main";
+import GetStarted from "../views/get-started/main";
+import NotFound from "../views/not-found/main";
+import UploadNow from "../views/upload-now/main";
 function Router() {
   const routes = [
     {
@@ -11,6 +12,10 @@ function Router() {
     {
       path: "/get-started",
       element: <GetStarted />,
+    },
+    {
+      path: "/upload-now",
+      element: <UploadNow />,
     },
     {
       path: "*",

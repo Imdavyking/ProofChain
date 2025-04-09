@@ -22,7 +22,7 @@ const GetStarted = () => {
               Provenance guaranteed.
             </p>
             <Link
-              href="/upload"
+              to="/upload-now"
               className="text-indigo-600 font-medium hover:underline"
             >
               Upload Now →
