@@ -45,7 +45,7 @@ export const processCSVUpload = async (req: Request, res: Response) => {
 
     await litNodeClient.connect();
 
-    const accessControlConditions = [
+    const accessControlConditions: any = [
       {
         contractAddress: "0xYourContract",
         chain: "filecoin",

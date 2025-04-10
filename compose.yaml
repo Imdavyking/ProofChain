@@ -13,21 +13,11 @@ services:
       - app-network
     secrets:
       - NODE_ENV
-      - OPENAI_API_KEY
-      - JWT_SECRET
       - PORT
-      - CHAIN_ID
-      - RPC_URL
-      - CONTRACT_ADDRESS
-      - API_SCAN_VERIFIER_KEY
-      - MONGO_URI
       - KEYSTORE_FILE
+      - FRONTEND_URL
       - KEYSTORE_PASSWORD
-      - API_BROWSER_URL
-      - COINGECKO_DEMO_API_KEY
-      - PINATA_JWT
     environment:
-      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/ai-bot}
       - FRONTEND_URL=http://localhost:3000
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100"]
@@ -86,32 +76,14 @@ networks:
 secrets:
   NODE_ENV:
     file: ./backend/secrets/NODE_ENV
-  OPENAI_API_KEY:
-    file: ./backend/secrets/OPENAI_API_KEY
-  JWT_SECRET:
-    file: ./backend/secrets/JWT_SECRET
   PORT:
     file: ./backend/secrets/PORT
   FRONTEND_URL:
     file: ./backend/secrets/FRONTEND_URL
-  CHAIN_ID:
-    file: ./backend/secrets/CHAIN_ID
-  RPC_URL:
-    file: ./backend/secrets/RPC_URL
-  CONTRACT_ADDRESS:
-    file: ./backend/secrets/CONTRACT_ADDRESS
-  API_SCAN_VERIFIER_KEY:
-    file: ./backend/secrets/API_SCAN_VERIFIER_KEY
   KEYSTORE_FILE:
     file: ./backend/secrets/KEYSTORE_FILE
   KEYSTORE_PASSWORD:
     file: ./backend/secrets/KEYSTORE_PASSWORD
-  COINGECKO_DEMO_API_KEY:
-    file: ./backend/secrets/COINGECKO_DEMO_API_KEY
-  PINATA_JWT:
-    file: ./backend/secrets/PINATA_JWT
-  API_BROWSER_URL:
-    file: ./backend/secrets/API_BROWSER_URL
 
 volumes:
   mongodb-data:

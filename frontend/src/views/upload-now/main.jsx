@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axios from "../../services/axios.config";
 
 export default function UploadNow() {
   const [file, setFile] = useState(null);

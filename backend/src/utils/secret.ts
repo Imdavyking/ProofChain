@@ -20,20 +20,7 @@ export const secret: {
   },
 
   loadAll: () => {
-    const secrets = [
-      "NODE_ENV",
-      "OPENAI_API_KEY",
-      "JWT_SECRET",
-      "PORT",
-      "FRONTEND_URL",
-      "CHAIN_ID",
-      "RPC_URL",
-      "CONTRACT_ADDRESS",
-      "API_SCAN_VERIFIER_KEY",
-      "COINGECKO_DEMO_API_KEY",
-      "PINATA_JWT",
-      "API_BROWSER_URL",
-    ];
+    const secrets = ["NODE_ENV", "JWT_SECRET", "PORT", "FRONTEND_URL"];
 
     const loadedSecrets: Record<string, string> = {};
 
