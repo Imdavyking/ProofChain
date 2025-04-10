@@ -6,6 +6,7 @@ import multer from "multer";
 import path from "path";
 import logger from "../config/logger";
 import { ethers } from "ethers";
+import { environment } from "../utils/config";
 dotenv.config();
 
 // Configure multer to accept only .csv files
@@ -54,8 +55,8 @@ export const processCSVUpload = async (req: Request, res: Response) => {
 
     const accessControlConditions: any = [
       {
-        contractAddress: "0xYourContract",
-        chain: "filecoin",
+        contractAddress: environment.DATASET_CONTRACT_ADDRESS,
+        chain: environment.LIT_PROTOCOL_IDENTIFIER,
         functionName: "canAccess",
         functionParams: [datasetId, ":userAddress"],
         functionAbi: {

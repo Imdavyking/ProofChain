@@ -26,6 +26,8 @@ export const secret: {
       "PORT",
       "FRONTEND_URL",
       "PINATA_JWT",
+      "DATASET_CONTRACT_ADDRESS",
+      "LIT_PROTOCOL_IDENTIFIER",
     ];
 
     const loadedSecrets: Record<string, string> = {};
