@@ -1113,7 +1113,7 @@
     siwe "^2.3.2"
     tslib "1.14.1"
 
-"@lit-protocol/contracts-sdk@7.1.0":
+"@lit-protocol/contracts-sdk@7.1.0", "@lit-protocol/contracts-sdk@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@lit-protocol/contracts-sdk/-/contracts-sdk-7.1.0.tgz#e6cd1410178e5c5e92271ce6d7d544ee4ff76fca"
   integrity sha512-H0sozMGcyd9z/W83fF2I+pdbCaxloydVAmr/Joa0PyhThVZNVdP7R+xPqiZgl+FvUtjhDSau7SVS64UTtocf5A==
@@ -1203,6 +1203,30 @@
     depd "^2.0.0"
     ethers "^5.7.1"
     pako "^2.1.0"
+    siwe "^2.3.2"
+    tslib "1.14.1"
+    util "0.12.5"
+
+"@lit-protocol/encryption@^7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@lit-protocol/encryption/-/encryption-7.1.0.tgz#df06872ccd7e21eb83fc802e696b8780974f6d5a"
+  integrity sha512-iUzH+4XM+oEZ8kJLTNh8FEJuJLj4hYabKbak6cwh8YFbUkabR/w9ENhp9FXvVDNJDSeEANvIMoVPVdBRjHQtpg==
+  dependencies:
+    "@ethersproject/abstract-provider" "5.7.0"
+    "@ethersproject/contracts" "5.7.0"
+    "@ethersproject/providers" "5.7.2"
+    "@lit-protocol/accs-schemas" "^0.0.24"
+    "@lit-protocol/constants" "7.1.0"
+    "@lit-protocol/contracts" "^0.0.74"
+    "@lit-protocol/logger" "7.1.0"
+    "@lit-protocol/misc" "7.1.0"
+    "@lit-protocol/types" "7.1.0"
+    "@lit-protocol/uint8arrays" "7.1.0"
+    "@openagenda/verror" "^3.1.4"
+    ajv "^8.12.0"
+    bech32 "^2.0.0"
+    depd "^2.0.0"
+    ethers "^5.7.1"
     siwe "^2.3.2"
     tslib "1.14.1"
     util "0.12.5"
@@ -2883,6 +2907,11 @@ crossws@^0.3.3:
   dependencies:
     uncrypto "^0.1.3"
 
+data-uri-to-buffer@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz#d8feb2b2881e6a4f58c2e08acfd0e2834e26222e"
+  integrity sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==
+
 date-and-time@^2.4.1:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/date-and-time/-/date-and-time-2.4.3.tgz#116963998a8cecd478955ae053f31a6747a988df"
@@ -3334,6 +3363,14 @@ fecha@^4.2.0:
   resolved "https://registry.yarnpkg.com/fecha/-/fecha-4.2.3.tgz#4d9ccdbc61e8629b259fdca67e65891448d569fd"
   integrity sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==
 
+fetch-blob@^3.1.2, fetch-blob@^3.1.4:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-3.2.0.tgz#f09b8d4bbd45adc6f0c20b7e787e793e309dcce9"
+  integrity sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==
+  dependencies:
+    node-domexception "^1.0.0"
+    web-streams-polyfill "^3.0.3"
+
 file-stream-rotator@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/file-stream-rotator/-/file-stream-rotator-0.6.1.tgz#007019e735b262bb6c6f0197e58e5c87cb96cec3"
@@ -3403,6 +3440,13 @@ for-each@^0.3.5:
   integrity sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==
   dependencies:
     is-callable "^1.2.7"
+
+formdata-polyfill@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz#24807c31c9d402e002ab3d8c720144ceb8848423"
+  integrity sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==
+  dependencies:
+    fetch-blob "^3.1.2"
 
 forwarded@0.2.0:
   version "0.2.0"
@@ -4841,6 +4885,11 @@ negotiator@^1.0.0:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-1.0.0.tgz#b6c91bb47172d69f93cfd7c357bbb529019b5f6a"
   integrity sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==
 
+node-domexception@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/node-domexception/-/node-domexception-1.0.0.tgz#6888db46a1f71c0b76b3f7555016b63fe64766e5"
+  integrity sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==
+
 node-fetch-native@^1.6.4, node-fetch-native@^1.6.6:
   version "1.6.6"
   resolved "https://registry.yarnpkg.com/node-fetch-native/-/node-fetch-native-1.6.6.tgz#ae1d0e537af35c2c0b0de81cbff37eedd410aa37"
@@ -4852,6 +4901,15 @@ node-fetch@^2.6.1, node-fetch@^2.6.12, node-fetch@^2.7.0:
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
   dependencies:
     whatwg-url "^5.0.0"
+
+node-fetch@^3.3.1:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-3.3.2.tgz#d1e889bacdf733b4ff3b2b243eb7a12866a0b78b"
+  integrity sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==
+  dependencies:
+    data-uri-to-buffer "^4.0.0"
+    fetch-blob "^3.1.4"
+    formdata-polyfill "^4.0.10"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -5063,6 +5121,13 @@ picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3, picomatch@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.1.tgz#3ba3833733646d9d3e4995946c1365a67fb07a42"
   integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
+
+pinata@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/pinata/-/pinata-2.2.0.tgz#909ab9df347edfaa3fb3d20267524b649b7e95b0"
+  integrity sha512-BleCb3D6LeBeLIaMxh4Hw+u48UdlR/jFUHyvHHWXRmKEwD+h6vgo5Q1i5PfNQ0Ydn0xe/6Zij7+uvM+JgYyMKA==
+  dependencies:
+    node-fetch "^3.3.1"
 
 pino-abstract-transport@v0.5.0:
   version "0.5.0"
@@ -6207,6 +6272,11 @@ walker@^1.0.8:
   integrity sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==
   dependencies:
     makeerror "1.0.12"
+
+web-streams-polyfill@^3.0.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz#2073b91a2fdb1fbfbd401e7de0ac9f8214cecb4b"
+  integrity sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"

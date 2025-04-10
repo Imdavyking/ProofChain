@@ -4,6 +4,8 @@ import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { LIT_NETWORK } from "@lit-protocol/constants";
 import multer from "multer";
 import path from "path";
+import logger from "../config/logger";
+import { ethers } from "ethers";
 dotenv.config();
 
 // Configure multer to accept only .csv files
@@ -23,6 +25,8 @@ export const upload = multer({
   },
 });
 
+const generateUniqueId = () => ethers.hexlify(ethers.randomBytes(32));
+
 /**
  * Handles CSV file upload and processing.
  * @param {Request} req - The request object containing the uploaded CSV file.
@@ -41,16 +45,19 @@ export const processCSVUpload = async (req: Request, res: Response) => {
     const litNodeClient = new LitJsSdk.LitNodeClientNodeJs({
       alertWhenUnauthorized: false,
       litNetwork: LIT_NETWORK.Datil,
+      debug: false,
     });
 
     await litNodeClient.connect();
+
+    const datasetId = generateUniqueId().replace("-", "");
 
     const accessControlConditions: any = [
       {
         contractAddress: "0xYourContract",
         chain: "filecoin",
         functionName: "canAccess",
-        functionParams: ["<DATASET_ID>", ":userAddress"],
+        functionParams: [datasetId, ":userAddress"],
         functionAbi: {
           inputs: [
             { internalType: "uint256", name: "datasetId", type: "uint256" },
@@ -79,6 +86,9 @@ export const processCSVUpload = async (req: Request, res: Response) => {
 
     return;
   } catch (error) {
+    if (error instanceof Error) {
+      logger.info(`Error processing CSV upload: ${error.message}`);
+    }
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
