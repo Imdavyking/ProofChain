@@ -12,12 +12,6 @@ services:
     networks:
       - app-network
     secrets:
-      - TWITTER_CONSUMER_KEY
-      - TWITTER_CONSUMER_SECRET
-      - TWITTER_ACCESS_TOKEN
-      - TWITTER_ACCESS_TOKEN_SECRET
-      - TWITTER_USER_ID
-      - TWITTER_BEARER_TOKEN
       - NODE_ENV
       - OPENAI_API_KEY
       - JWT_SECRET
@@ -27,9 +21,6 @@ services:
       - CONTRACT_ADDRESS
       - API_SCAN_VERIFIER_KEY
       - MONGO_URI
-      - REDIS_HOST
-      - REDIS_PORT
-      - REDIS_PASSWORD
       - KEYSTORE_FILE
       - KEYSTORE_PASSWORD
       - API_BROWSER_URL
@@ -37,9 +28,6 @@ services:
       - PINATA_JWT
     environment:
       - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/ai-bot}
-      - REDIS_HOST=${REDIS_HOST:-redis}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
       - FRONTEND_URL=http://localhost:3000
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100"]
@@ -96,26 +84,6 @@ networks:
     driver: bridge
 
 secrets:
-  MONGO_URI:
-    file: ./backend/secrets/MONGO_URI
-  TWITTER_CONSUMER_KEY:
-    file: ./backend/secrets/TWITTER_CONSUMER_KEY
-  TWITTER_CONSUMER_SECRET:
-    file: ./backend/secrets/TWITTER_CONSUMER_SECRET
-  TWITTER_ACCESS_TOKEN:
-    file: ./backend/secrets/TWITTER_ACCESS_TOKEN
-  TWITTER_ACCESS_TOKEN_SECRET:
-    file: ./backend/secrets/TWITTER_ACCESS_TOKEN_SECRET
-  TWITTER_USER_ID:
-    file: ./backend/secrets/TWITTER_USER_ID
-  TWITTER_BEARER_TOKEN:
-    file: ./backend/secrets/TWITTER_BEARER_TOKEN
-  REDIS_HOST:
-    file: ./backend/secrets/REDIS_HOST
-  REDIS_PORT:
-    file: ./backend/secrets/REDIS_PORT
-  REDIS_PASSWORD:
-    file: ./backend/secrets/REDIS_PASSWORD
   NODE_ENV:
     file: ./backend/secrets/NODE_ENV
   OPENAI_API_KEY:

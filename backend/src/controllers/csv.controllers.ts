@@ -2,7 +2,26 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { LIT_NETWORK } from "@lit-protocol/constants";
+import multer from "multer";
+import path from "path";
 dotenv.config();
+
+// Configure multer to accept only .csv files
+const storage = multer.memoryStorage(); // you can also use diskStorage if preferred
+export const upload = multer({
+  storage,
+  fileFilter: (
+    _: Request,
+    file: Express.Multer.File,
+    cb: multer.FileFilterCallback
+  ) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext !== ".csv") {
+      return cb(new Error("Only CSV files are allowed"));
+    }
+    cb(null, true);
+  },
+});
 
 /**
  * Handles CSV file upload and processing.
@@ -12,6 +31,13 @@ dotenv.config();
  */
 export const processCSVUpload = async (req: Request, res: Response) => {
   try {
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ error: "CSV file is required" });
+      return;
+    }
+
     const litNodeClient = new LitJsSdk.LitNodeClientNodeJs({
       alertWhenUnauthorized: false,
       litNetwork: LIT_NETWORK.Datil,
@@ -41,10 +67,17 @@ export const processCSVUpload = async (req: Request, res: Response) => {
         },
       },
     ];
-    // const { ciphertext, dataToEncryptHash } = await litNodeClient.encrypt({
-    //   accessControlConditions,
-    //   dataToEncrypt: message,
-    // });
+    const { ciphertext, dataToEncryptHash } = await litNodeClient.encrypt({
+      accessControlConditions,
+      dataToEncrypt: new Uint8Array(file.buffer),
+    });
+    res.status(200).json({
+      message: "CSV encrypted successfully",
+      ciphertext,
+      dataToEncryptHash,
+    });
+
+    return;
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }

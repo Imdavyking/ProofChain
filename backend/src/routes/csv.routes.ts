@@ -1,6 +1,6 @@
 import express from "express";
-import { processCSVUpload } from "../controllers/csv.controllers";
+import { processCSVUpload, upload } from "../controllers/csv.controllers";
 
 const csvRoutes = express.Router();
-csvRoutes.post("/", processCSVUpload);
+csvRoutes.post("/", upload.single("csvFile"), processCSVUpload);
 export default csvRoutes;

@@ -4,8 +4,11 @@ pragma solidity ^0.8.19;
 contract DatasetMarketplace {
     struct Dataset {
         address owner;
-        string cid; // IPFS CID
-        uint256 price; // in wei
+        string cid;
+        uint256 price;
+        uint256 starsTotal;
+        uint256 starsCount;
+        uint256 downloads;
     }
 
     uint256 public datasetCounter;
@@ -13,6 +16,12 @@ contract DatasetMarketplace {
 
     // datasetId => buyer => hasAccess
     mapping(uint256 => mapping(address => bool)) public hasAccess;
+
+    // datasetId => user => hasRated
+    mapping(uint256 => mapping(address => bool)) public hasRated;
+
+    // datasetId => reviewId => review text
+    mapping(uint256 => mapping(uint256 => string)) public reviews;
 
     event DatasetCreated(
         uint256 indexed id,
@@ -22,47 +31,47 @@ contract DatasetMarketplace {
     );
     event DatasetUpdated(uint256 indexed id, string newCid, uint256 newPrice);
     event DatasetPurchased(uint256 indexed id, address indexed buyer);
+    event DatasetRated(uint256 indexed id, address indexed rater, uint8 stars);
+    event DatasetDownloaded(uint256 indexed id, address indexed user);
 
-    /// errors
     error DatasetMarketplace__NotDatasetOwner();
     error DatasetMarketplace__InsufficientPayment();
     error DatasetMarketplace__AccessDenied();
     error DatasetMarketplace__DatasetNotFound();
     error DatasetMarketplace__InvalidDatasetId();
     error DatasetMarketplace__AlreadyHasAccess();
+    error DatasetMarketplace__AlreadyRated();
+    error DatasetMarketplace__InvalidStarValue();
+    error DatasetMarketplace__PaymentFailed();
 
-    /// @dev Upload a new dataset
     function uploadDataset(string calldata cid, uint256 price) external {
         datasets[datasetCounter] = Dataset({
             owner: msg.sender,
             cid: cid,
-            price: price
+            price: price,
+            starsTotal: 0,
+            starsCount: 0,
+            downloads: 0
         });
 
         emit DatasetCreated(datasetCounter, msg.sender, cid, price);
         datasetCounter++;
     }
 
-    /// @dev Update dataset info (only by uploader)
     function updateDataset(
         uint256 datasetId,
         string calldata newCid,
         uint256 newPrice
     ) external {
-        Dataset storage dataset = datasets[datasetId];
-        if (dataset.owner != msg.sender) {
-            revert DatasetMarketplace__NotDatasetOwner();
-        }
-
-        if (datasetId >= datasetCounter) {
+        if (datasetId >= datasetCounter)
             revert DatasetMarketplace__InvalidDatasetId();
-        }
-        if (newPrice == 0) {
-            revert DatasetMarketplace__InsufficientPayment();
-        }
-        if (bytes(newCid).length == 0) {
+
+        Dataset storage dataset = datasets[datasetId];
+        if (dataset.owner != msg.sender)
+            revert DatasetMarketplace__NotDatasetOwner();
+        if (newPrice == 0) revert DatasetMarketplace__InsufficientPayment();
+        if (bytes(newCid).length == 0)
             revert DatasetMarketplace__AccessDenied();
-        }
 
         dataset.cid = newCid;
         dataset.price = newPrice;
@@ -70,30 +79,27 @@ contract DatasetMarketplace {
         emit DatasetUpdated(datasetId, newCid, newPrice);
     }
 
-    /// @dev Purchase access to dataset
     function purchaseAccess(uint256 datasetId) external payable {
-        Dataset memory dataset = datasets[datasetId];
-        if (datasetId >= datasetCounter) {
+        if (datasetId >= datasetCounter)
             revert DatasetMarketplace__DatasetNotFound();
-        }
 
-        if (msg.value < dataset.price) {
+        Dataset memory dataset = datasets[datasetId];
+        if (msg.value < dataset.price)
             revert DatasetMarketplace__InsufficientPayment();
-        }
-
-        if (hasAccess[datasetId][msg.sender]) {
+        if (hasAccess[datasetId][msg.sender])
             revert DatasetMarketplace__AlreadyHasAccess();
-        }
 
         hasAccess[datasetId][msg.sender] = true;
 
-        // Transfer funds to the dataset provider
         (bool success, ) = dataset.owner.call{value: msg.value}("");
+
+        if (!success) {
+            revert DatasetMarketplace__PaymentFailed();
+        }
 
         emit DatasetPurchased(datasetId, msg.sender);
     }
 
-    /// @dev Check access (Lit Protocol will call this off-chain or via Lit Action)
     function canAccess(
         uint256 datasetId,
         address user
@@ -101,11 +107,56 @@ contract DatasetMarketplace {
         return hasAccess[datasetId][user];
     }
 
-    /// @dev Helper to get dataset details
     function getDataset(
         uint256 datasetId
-    ) external view returns (string memory cid, uint256 price, address owner) {
+    )
+        external
+        view
+        returns (
+            string memory cid,
+            uint256 price,
+            address owner,
+            uint256 stars,
+            uint256 count,
+            uint256 downloads
+        )
+    {
         Dataset memory dataset = datasets[datasetId];
-        return (dataset.cid, dataset.price, dataset.owner);
+        return (
+            dataset.cid,
+            dataset.price,
+            dataset.owner,
+            dataset.starsTotal,
+            dataset.starsCount,
+            dataset.downloads
+        );
+    }
+
+    /// ⭐ Users can rate a dataset (once)
+    function rateDataset(uint256 datasetId, uint8 stars) external {
+        if (datasetId >= datasetCounter)
+            revert DatasetMarketplace__DatasetNotFound();
+        if (stars < 1 || stars > 5)
+            revert DatasetMarketplace__InvalidStarValue();
+        if (hasRated[datasetId][msg.sender])
+            revert DatasetMarketplace__AlreadyRated();
+
+        Dataset storage dataset = datasets[datasetId];
+        dataset.starsTotal += stars;
+        dataset.starsCount += 1;
+        hasRated[datasetId][msg.sender] = true;
+
+        emit DatasetRated(datasetId, msg.sender, stars);
+    }
+
+    /// ⬇️ Increase download count
+    function recordDownload(uint256 datasetId) external {
+        if (!hasAccess[datasetId][msg.sender])
+            revert DatasetMarketplace__AccessDenied();
+
+        Dataset storage dataset = datasets[datasetId];
+        dataset.downloads += 1;
+
+        emit DatasetDownloaded(datasetId, msg.sender);
     }
 }
