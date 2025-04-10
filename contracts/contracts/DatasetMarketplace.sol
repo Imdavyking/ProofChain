@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract DatasetMarketplace {
+contract DatasetMarketplace is ReentrancyGuard {
     struct Dataset {
         address owner;
         string cid;
@@ -79,7 +80,7 @@ contract DatasetMarketplace {
         emit DatasetUpdated(datasetId, newCid, newPrice);
     }
 
-    function purchaseAccess(uint256 datasetId) external payable {
+    function purchaseAccess(uint256 datasetId) external payable nonReentrant {
         if (datasetId >= datasetCounter)
             revert DatasetMarketplace__DatasetNotFound();
 
