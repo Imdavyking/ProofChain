@@ -1,8 +1,10 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function UploadNow() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
@@ -17,6 +19,30 @@ export default function UploadNow() {
 
     setFile(uploadedFile);
     setError("");
+    setSuccess("");
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("csvFile", file);
+
+    try {
+      const response = await axios.post("/api/upload-csv", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setSuccess("✅ File uploaded successfully!");
+      setError("");
+      console.log(response.data);
+    } catch (err) {
+      console.error(err);
+      setError("❌ Upload failed.");
+      setSuccess("");
+    }
   };
 
   return (
@@ -45,8 +71,12 @@ export default function UploadNow() {
         )}
 
         {error && <div className="mt-4 text-red-600 text-sm">⚠️ {error}</div>}
+        {success && (
+          <div className="mt-4 text-green-600 text-sm">{success}</div>
+        )}
 
         <button
+          onClick={handleUpload}
           disabled={!file}
           className={`mt-6 w-full py-2 px-4 rounded-lg text-white font-semibold ${
             file
