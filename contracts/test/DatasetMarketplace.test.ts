@@ -1,8 +1,16 @@
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { DatasetMarketplace } from "../typechain-types";
+import { ContractTransactionResponse } from "ethers";
 
 describe("DatasetMarketplace", function () {
-  let marketplace: any, owner, user1: any, user2: any;
+  let marketplace: DatasetMarketplace & {
+      deploymentTransaction(): ContractTransactionResponse;
+    },
+    owner,
+    user1: HardhatEthersSigner,
+    user2: HardhatEthersSigner;
 
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
