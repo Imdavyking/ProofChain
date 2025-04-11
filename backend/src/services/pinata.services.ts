@@ -15,7 +15,6 @@ export const uploadToPinata = async (file: File) => {
     const url = await pinata.gateways.public.convert(cid);
     return new PinataUploadResponse(url, gateway);
   } catch (error) {
-    console.log(error);
     if (error instanceof Error) {
       logger.info(`Error processing CSV upload: ${error.message}`);
     }

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import axios from "../../services/axios.config";
+import { FaSpinner } from "react-icons/fa";
 
 export default function UploadNow() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+  const [isUploading, setisUploading] = useState(false);
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
 
@@ -29,6 +30,7 @@ export default function UploadNow() {
     formData.append("csvFile", file);
 
     try {
+      setisUploading(true);
       const response = await axios.post("/api/upload-csv", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -42,6 +44,8 @@ export default function UploadNow() {
       console.error(err);
       setError("❌ Upload failed.");
       setSuccess("");
+    } finally {
+      setisUploading(false);
     }
   };
 
@@ -77,14 +81,20 @@ export default function UploadNow() {
 
         <button
           onClick={handleUpload}
-          disabled={!file}
+          disabled={!file || isUploading}
           className={`mt-6 w-full py-2 px-4 rounded-lg text-white font-semibold ${
             file
               ? "bg-indigo-600 hover:bg-indigo-700"
               : "bg-gray-300 cursor-not-allowed"
           }`}
         >
-          Upload Now
+          {isUploading ? (
+            <div className="flex justify-center items-center">
+              <FaSpinner className="animate-spin  text-3xl" />
+            </div>
+          ) : (
+            "Upload Now"
+          )}
         </button>
       </div>
     </div>
