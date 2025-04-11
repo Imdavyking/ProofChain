@@ -14,9 +14,12 @@ services:
     secrets:
       - NODE_ENV
       - PORT
-      - KEYSTORE_FILE
+      - PRIVATE_KEY
       - FRONTEND_URL
-      - KEYSTORE_PASSWORD
+      - JWT_SECRET
+      - PINATA_JWT
+      - DATASET_CONTRACT_ADDRESS
+      - LIT_PROTOCOL_IDENTIFIER
     environment:
       - FRONTEND_URL=http://localhost:3000
     healthcheck:
@@ -80,10 +83,16 @@ secrets:
     file: ./backend/secrets/PORT
   FRONTEND_URL:
     file: ./backend/secrets/FRONTEND_URL
-  KEYSTORE_FILE:
-    file: ./backend/secrets/KEYSTORE_FILE
-  KEYSTORE_PASSWORD:
-    file: ./backend/secrets/KEYSTORE_PASSWORD
+  PRIVATE_KEY:
+    file: ./backend/secrets/PRIVATE_KEY
+  JWT_SECRET:
+    file: ./backend/secrets/JWT_SECRET
+  PINATA_JWT:
+    file: ./backend/secrets/PINATA_JWT
+  DATASET_CONTRACT_ADDRESS:
+    file: ./backend/secrets/DATASET_CONTRACT_ADDRESS
+  LIT_PROTOCOL_IDENTIFIER:
+    file: ./backend/secrets/LIT_PROTOCOL_IDENTIFIER
 
 volumes:
   mongodb-data:
