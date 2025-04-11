@@ -86,20 +86,14 @@ export default function UploadNow() {
             preview.push(allRows[randomIndex]);
           }
 
-          const saveDatasetCidResult = await saveDatasetCid(
-            response.data.cid,
+          const saveDatasetCidResult = await saveDatasetCid({
+            cid: response.data.cid,
             price,
-            +category,
-            typeof preview === "string" ? preview : JSON.stringify(preview),
-            file.name
-          );
-
-          // cid: string;
-          // price: number | string;
-          // category: number | string;
-          // preview: string;
-          // description: string;
-          // title: string;
+            category: +category,
+            preview:
+              typeof preview === "string" ? preview : JSON.stringify(preview),
+            title: file.name,
+          });
 
           console.log(saveDatasetCidResult);
           setSuccess("✅ File uploaded successfully!");
