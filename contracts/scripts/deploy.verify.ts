@@ -51,7 +51,7 @@ async function main() {
    * Backend
    */
   // .envs
-  updateEnv(datasetMarketplaceAddress, "frontend", "DATASET_CONTRACT_ADDRESS");
+  updateEnv(datasetMarketplaceAddress, "backend", "DATASET_CONTRACT_ADDRESS");
 
   /**
    * Indexer
