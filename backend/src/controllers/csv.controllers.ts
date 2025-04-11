@@ -143,8 +143,10 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       return;
     }
 
+    const cid = pinataResponse.getUrl().split("/").pop();
+
     res.status(200).json({
-      url: pinataResponse.getUrl(),
+      cid,
     });
 
     return;

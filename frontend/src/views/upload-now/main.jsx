@@ -4,11 +4,13 @@ import { FaSpinner } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "../../utils/constants";
 import { toast } from "react-toastify";
+import { saveDatasetCid } from "../../services/blockchain.services";
 export default function UploadNow() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isUploading, setisUploading] = useState(false);
+  const [price, setPrice] = useState(0);
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
 
@@ -27,6 +29,16 @@ export default function UploadNow() {
 
   const handleUpload = async () => {
     if (!file) return;
+
+    if (!price || isNaN(price) || price <= 0) {
+      setError("Please enter a price.");
+      return;
+    }
+
+    if (isUploading) {
+      toast.error("Already uploading a file.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("csvFile", file);
@@ -56,6 +68,12 @@ export default function UploadNow() {
         }
       );
 
+      const saveDatasetCidResult = await saveDatasetCid(
+        response.data.cid,
+        price
+      );
+
+      console.log(saveDatasetCidResult);
       setSuccess("✅ File uploaded successfully!");
       setError("");
       console.log(response.data);
@@ -87,6 +105,26 @@ export default function UploadNow() {
                      file:bg-indigo-50 file:text-indigo-700
                      hover:file:bg-indigo-100 cursor-pointer"
         />
+
+        <div className="mt-6">
+          <label
+            htmlFor="price"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Price (in tFIL)
+          </label>
+          <input
+            type="number"
+            id="price"
+            name="price"
+            min="0"
+            step="0.01"
+            placeholder="Enter price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 p-3 text-lg"
+          />
+        </div>
 
         {file && (
           <div className="mt-4 text-green-600 text-sm">

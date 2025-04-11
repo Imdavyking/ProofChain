@@ -1,0 +1,140 @@
+import {
+  BLOCK_EXPLORER_URL,
+  CHAIN_ID,
+  CHAIN_NAME,
+  CHAIN_SYMBOL,
+  CURRENCY_NAME,
+  DATASET_CONTRACT_ADDRESS,
+  RPC_URL,
+} from "../utils/constants";
+import { BrowserProvider, ethers } from "ethers";
+import datasetAbi from "../abis/dataset.abi";
+
+const failedKey = "FAILED-";
+
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
+const datasetMarketPlaceAbi = new ethers.Interface(datasetAbi);
+
+async function switchOrAddChain(
+  ethProvider: ethers.JsonRpcApiProvider,
+  switchChainId: string | number
+) {
+  try {
+    const currentChainId = Number(
+      await ethProvider.provider.send("eth_chainId", [])
+    );
+    const targetChainId = Number(switchChainId);
+    const chainIdHex = `0x${targetChainId.toString(16)}`;
+
+    console.log(
+      `Current chainId: ${currentChainId}, Switch chainId: ${targetChainId}`
+    );
+
+    if (currentChainId === targetChainId) {
+      console.log(`Already connected to ${targetChainId}`);
+      return;
+    }
+
+    try {
+      await ethProvider.provider.send("wallet_switchEthereumChain", [
+        { chainId: chainIdHex },
+      ]);
+      console.log(`Switched to ${targetChainId}`);
+    } catch (error) {
+      console.error(`Error switching chain:`, error);
+
+      if (error.code === 4902) {
+        console.log(`Chain ${targetChainId} not found. Attempting to add.`);
+
+        if (targetChainId === Number(CHAIN_ID)) {
+          await ethProvider.provider.send("wallet_addEthereumChain", [
+            {
+              chainId: chainIdHex,
+              chainName: CHAIN_NAME,
+              nativeCurrency: {
+                name: CURRENCY_NAME,
+                symbol: CHAIN_SYMBOL,
+                decimals: 18,
+              },
+              rpcUrls: [RPC_URL],
+              blockExplorerUrls: [BLOCK_EXPLORER_URL],
+            },
+          ]);
+          console.log(`${CHAIN_NAME} added and switched`);
+        }
+      } else {
+        console.error(`Failed to switch to ${targetChainId}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error(`Unexpected error in switchOrAddChain:`, error);
+  }
+}
+
+function parseContractError(error: any, contractInterface: ethers.Interface) {
+  if (!error?.data || !contractInterface) return null;
+
+  try {
+    const errorFragment = contractInterface.fragments.find(
+      (fragment) =>
+        fragment.type === "error" &&
+        error.data.startsWith((fragment as any).selector)
+    );
+
+    return errorFragment ? contractInterface.parseError(error.data) : null;
+  } catch (err) {
+    console.error("Error parsing contract error:", err);
+    return null;
+  }
+}
+
+export const getSigner = async () => {
+  const provider = new BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  return provider.getSigner();
+};
+
+export const getDatasetContract = async () => {
+  if (!window.ethereum) {
+    console.log(
+      "MetaMask is not installed. Please install it to use this feature."
+    );
+    return;
+  }
+
+  const signer = await getSigner();
+
+  await switchOrAddChain(signer.provider, CHAIN_ID);
+
+  return new ethers.Contract(
+    DATASET_CONTRACT_ADDRESS,
+    datasetMarketPlaceAbi,
+    signer
+  );
+};
+
+export const saveDatasetCid = async (cid: string, price: number | string) => {
+  try {
+    const datasetContract = await getDatasetContract();
+
+    if (!datasetContract) {
+      console.error("Failed to get dataset contract");
+      return;
+    }
+
+    const transaction = await datasetContract.uploadDataset(
+      cid,
+      ethers.parseEther(price.toString())
+    );
+    const receipt = await transaction.wait(1);
+    return `Uploaded dataset with tx hash: ${receipt.transactionHash}`;
+  } catch (error) {
+    console.error("Error saving cid:", error);
+    return `${failedKey}${error.message}`;
+  }
+};

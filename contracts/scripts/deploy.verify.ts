@@ -1,8 +1,12 @@
 import DatasetMarketplaceDeployer from "../ignition/modules/DatasetMarketplace";
-import hre from "hardhat";
+import hre, { network } from "hardhat";
 import { verify } from "./verify.deploy";
+import { cleanDeployments } from "../utils/clean";
 
 async function main() {
+  const chainId = network.config.chainId!;
+
+  cleanDeployments(chainId!);
   const { datasetMarketplace } = await hre.ignition.deploy(
     DatasetMarketplaceDeployer
   );

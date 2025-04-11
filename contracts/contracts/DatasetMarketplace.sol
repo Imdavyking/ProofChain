@@ -10,6 +10,7 @@ contract DatasetMarketplace is ReentrancyGuard {
         uint256 starsTotal;
         uint256 starsCount;
         uint256 downloads;
+        uint256 createdAt;
     }
 
     uint256 public datasetCounter;
@@ -28,6 +29,7 @@ contract DatasetMarketplace is ReentrancyGuard {
         uint256 indexed id,
         address indexed owner,
         string cid,
+        uint256 createdAt,
         uint256 price
     );
     event DatasetUpdated(uint256 indexed id, string newCid, uint256 newPrice);
@@ -52,10 +54,17 @@ contract DatasetMarketplace is ReentrancyGuard {
             price: price,
             starsTotal: 0,
             starsCount: 0,
+            createdAt: block.timestamp,
             downloads: 0
         });
 
-        emit DatasetCreated(datasetCounter, msg.sender, cid, price);
+        emit DatasetCreated(
+            datasetCounter,
+            msg.sender,
+            cid,
+            block.timestamp,
+            price
+        );
         datasetCounter++;
     }
 
