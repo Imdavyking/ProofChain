@@ -7,6 +7,7 @@ import path from "path";
 import logger from "../config/logger";
 import { ethers } from "ethers";
 import { environment } from "../utils/config";
+import { uploadToPinata } from "../services/pinata.services";
 dotenv.config();
 
 // Configure multer to accept only .csv files
@@ -53,7 +54,7 @@ export const processCSVUpload = async (req: Request, res: Response) => {
 
     const datasetId = generateUniqueId().replace("-", "");
 
-    const accessControlConditions: any = [
+    const evmContractConditions: any = [
       {
         contractAddress: environment.DATASET_CONTRACT_ADDRESS,
         chain: environment.LIT_PROTOCOL_IDENTIFIER,
@@ -65,24 +66,47 @@ export const processCSVUpload = async (req: Request, res: Response) => {
             { internalType: "address", name: "user", type: "address" },
           ],
           name: "canAccess",
-          outputs: [{ internalType: "bool", name: "", type: "bool" }],
+          outputs: [
+            { internalType: "bool", name: "accessAccepted", type: "bool" },
+          ],
           stateMutability: "view",
           type: "function",
         },
         returnValueTest: {
+          key: "accessAccepted",
           comparator: "=",
           value: "true",
         },
       },
     ];
     const { ciphertext, dataToEncryptHash } = await litNodeClient.encrypt({
-      accessControlConditions,
+      evmContractConditions,
       dataToEncrypt: new Uint8Array(file.buffer),
     });
+
+    const nftMetaJsonBuffer = Buffer.from(
+      JSON.stringify({ ciphertext, dataToEncryptHash }, null, 2)
+    );
+    const nftMetaJsonBlob = new Blob([nftMetaJsonBuffer], {
+      type: "application/json",
+    });
+    const nftMetaJsonFile = new File(
+      [nftMetaJsonBlob],
+      `encrypted-${datasetId}.json`,
+      {
+        type: "application/json",
+      }
+    );
+
+    const pinataResponse = await uploadToPinata(nftMetaJsonFile);
+
+    if (!pinataResponse) {
+      res.status(500).json({ error: "Failed to upload to Pinata" });
+      return;
+    }
+
     res.status(200).json({
-      message: "CSV encrypted successfully",
-      ciphertext,
-      dataToEncryptHash,
+      url: pinataResponse.getUrl(),
     });
 
     return;

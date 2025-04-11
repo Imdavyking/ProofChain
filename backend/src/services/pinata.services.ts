@@ -1,5 +1,6 @@
 import { PinataSDK } from "pinata";
 import { environment } from "../utils/config";
+import logger from "../config/logger";
 
 const gateway = "https://emerald-odd-bee-965.mypinata.cloud";
 
@@ -13,7 +14,11 @@ export const uploadToPinata = async (file: File) => {
     const { cid } = await pinata.upload.public.file(file);
     const url = await pinata.gateways.public.convert(cid);
     return new PinataUploadResponse(url, gateway);
-  } catch (_) {
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      logger.info(`Error processing CSV upload: ${error.message}`);
+    }
     return null;
   }
 };
@@ -25,4 +30,7 @@ class PinataUploadResponse {
     this.#url = url;
     this.#gateWay = gateway;
   }
+
+  getUrl = () => this.#url;
+  getGateWay = () => this.#gateWay;
 }
