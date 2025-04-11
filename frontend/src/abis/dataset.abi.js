@@ -73,6 +73,12 @@ export default [
       {
         indexed: false,
         internalType: "uint256",
+        name: "createdAt",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
         name: "price",
         type: "uint256",
       },
@@ -244,6 +250,26 @@ export default [
         internalType: "uint256",
         name: "downloads",
         type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "createdAt",
+        type: "uint256",
+      },
+      {
+        internalType: "enum DatasetMarketplace.DatasetCategory",
+        name: "category",
+        type: "uint8",
+      },
+      {
+        internalType: "string",
+        name: "title",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "preview",
+        type: "string",
       },
     ],
     stateMutability: "view",
@@ -443,6 +469,21 @@ export default [
         internalType: "uint256",
         name: "price",
         type: "uint256",
+      },
+      {
+        internalType: "enum DatasetMarketplace.DatasetCategory",
+        name: "category",
+        type: "uint8",
+      },
+      {
+        internalType: "string",
+        name: "preview",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "title",
+        type: "string",
       },
     ],
     name: "uploadDataset",
