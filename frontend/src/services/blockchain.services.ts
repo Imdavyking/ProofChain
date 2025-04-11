@@ -8,7 +8,7 @@ import {
   RPC_URL,
 } from "../utils/constants";
 import { BrowserProvider, ethers } from "ethers";
-import datasetAbi from "../abis/dataset.abi";
+import datasetAbi from "../assets/json/dataset.abi.json";
 
 const failedKey = "FAILED-";
 
