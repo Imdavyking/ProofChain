@@ -1,8 +1,9 @@
 // src/lib/axios.js
 import axios from "axios";
+import { SERVER_URL } from "../utils/constants";
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000",
+  baseURL: SERVER_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

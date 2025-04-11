@@ -77,4 +77,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 const server = createServer(app);
 
+console.log(`Server running on port ${server}`);
+
 export default server;

@@ -8,6 +8,7 @@ import logger from "../config/logger";
 import { ethers } from "ethers";
 import { environment } from "../utils/config";
 import { uploadToPinata } from "../services/pinata.services";
+import io from "../utils/create.websocket";
 dotenv.config();
 
 // Configure multer to accept only .csv files
@@ -38,6 +39,14 @@ const generateUniqueId = () => ethers.hexlify(ethers.randomBytes(32));
 export const processCSVUpload = async (req: Request, res: Response) => {
   try {
     const file = req.file;
+    const socketId = req.query.socketId as string;
+
+    logger.info(`Processing CSV upload for socket ID: ${socketId}`);
+
+    if (!socketId) {
+      res.status(400).json({ error: "Socket ID is required" });
+      return;
+    }
 
     if (!file) {
       res.status(400).json({ error: "CSV file is required" });
@@ -50,7 +59,17 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       debug: false,
     });
 
+    io.emit(socketId, {
+      message: "Connecting to Lit Node...",
+      status: "info",
+    });
+
     await litNodeClient.connect();
+
+    io.emit(socketId, {
+      message: "Connected to Lit Node",
+      status: "success",
+    });
 
     const datasetId = generateUniqueId().replace("-", "");
 
@@ -79,11 +98,20 @@ export const processCSVUpload = async (req: Request, res: Response) => {
         },
       },
     ];
+
+    io.emit(socketId, {
+      message: "Generating access control conditions...",
+      status: "info",
+    });
     const { ciphertext, dataToEncryptHash } = await litNodeClient.encrypt({
       evmContractConditions,
       dataToEncrypt: new Uint8Array(file.buffer),
     });
 
+    io.emit(socketId, {
+      message: "Data encrypted successfully",
+      status: "success",
+    });
     const nftMetaJsonBuffer = Buffer.from(
       JSON.stringify({ ciphertext, dataToEncryptHash }, null, 2)
     );
@@ -98,7 +126,17 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       }
     );
 
+    io.emit(socketId, {
+      message: "Uploading to Pinata...",
+      status: "info",
+    });
+
     const pinataResponse = await uploadToPinata(nftMetaJsonFile);
+
+    io.emit(socketId, {
+      message: "Upload to Pinata successful",
+      status: "success",
+    });
 
     if (!pinataResponse) {
       res.status(500).json({ error: "Failed to upload to Pinata" });

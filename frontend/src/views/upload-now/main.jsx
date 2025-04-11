@@ -1,7 +1,9 @@
 import { useState } from "react";
 import axios from "../../services/axios.config";
 import { FaSpinner } from "react-icons/fa";
-
+import { io } from "socket.io-client";
+import { SERVER_URL } from "../../utils/constants";
+import { toast } from "react-toastify";
 export default function UploadNow() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
@@ -28,14 +30,31 @@ export default function UploadNow() {
 
     const formData = new FormData();
     formData.append("csvFile", file);
+    const socket = io(SERVER_URL);
 
     try {
       setisUploading(true);
-      const response = await axios.post("/api/upload-csv", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+
+      const socketId = crypto.randomUUID().replaceAll("-", "");
+
+      console.log(`Socket ID: ${socketId}`);
+
+      socket.on(socketId, (data) => {
+        console.log("Socket data received:", data);
+        const { status, message } = data;
+
+        toast.dismiss();
+        toast[status]?.(message);
       });
+      const response = await axios.post(
+        `/api/upload-csv?socketId=${socketId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       setSuccess("✅ File uploaded successfully!");
       setError("");
@@ -46,6 +65,7 @@ export default function UploadNow() {
       setSuccess("");
     } finally {
       setisUploading(false);
+      socket.close();
     }
   };
 
