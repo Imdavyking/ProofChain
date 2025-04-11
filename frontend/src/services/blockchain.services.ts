@@ -118,7 +118,11 @@ export const getDatasetContract = async () => {
   );
 };
 
-export const saveDatasetCid = async (cid: string, price: number | string) => {
+export const saveDatasetCid = async (
+  cid: string,
+  price: number | string,
+  category: number
+) => {
   try {
     const datasetContract = await getDatasetContract();
 
@@ -129,7 +133,8 @@ export const saveDatasetCid = async (cid: string, price: number | string) => {
 
     const transaction = await datasetContract.uploadDataset(
       cid,
-      ethers.parseEther(price.toString())
+      ethers.parseEther(price.toString()),
+      category
     );
     const receipt = await transaction.wait(1);
     return `Uploaded dataset with tx hash: ${receipt.transactionHash}`;

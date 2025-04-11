@@ -35,12 +35,12 @@ const GetStarted = () => {
               Browse verified datasets categorized by type, rating, and quality.
               Train better AI.
             </p>
-            <a
-              href="#browse"
+            <Link
+              to="/discover-dataset"
               className="text-indigo-600 font-medium hover:underline"
             >
               Explore →
-            </a>
+            </Link>
           </div>
 
           <div className="bg-gray-100 p-6 rounded-xl shadow hover:shadow-md transition">

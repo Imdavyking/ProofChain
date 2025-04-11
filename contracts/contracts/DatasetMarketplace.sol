@@ -3,6 +3,11 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract DatasetMarketplace is ReentrancyGuard {
+    enum DatasetCategory {
+        Finance,
+        Medicine,
+        Text
+    }
     struct Dataset {
         address owner;
         string cid;
@@ -11,6 +16,7 @@ contract DatasetMarketplace is ReentrancyGuard {
         uint256 starsCount;
         uint256 downloads;
         uint256 createdAt;
+        DatasetCategory category;
     }
 
     uint256 public datasetCounter;
@@ -47,7 +53,11 @@ contract DatasetMarketplace is ReentrancyGuard {
     error DatasetMarketplace__InvalidStarValue();
     error DatasetMarketplace__PaymentFailed();
 
-    function uploadDataset(string calldata cid, uint256 price) external {
+    function uploadDataset(
+        string calldata cid,
+        uint256 price,
+        DatasetCategory category
+    ) external {
         datasets[datasetCounter] = Dataset({
             owner: msg.sender,
             cid: cid,
@@ -55,7 +65,8 @@ contract DatasetMarketplace is ReentrancyGuard {
             starsTotal: 0,
             starsCount: 0,
             createdAt: block.timestamp,
-            downloads: 0
+            downloads: 0,
+            category: category
         });
 
         emit DatasetCreated(

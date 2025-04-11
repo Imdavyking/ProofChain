@@ -4,11 +4,15 @@ import { FaSpinner } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "../../utils/constants";
 import { toast } from "react-toastify";
-import { saveDatasetCid } from "../../services/blockchain.services";
+import {
+  DatasetCategory,
+  saveDatasetCid,
+} from "../../services/blockchain.services";
 export default function UploadNow() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [category, setCategory] = useState("0");
   const [isUploading, setisUploading] = useState(false);
   const [price, setPrice] = useState(0);
   const handleFileChange = (e) => {
@@ -68,9 +72,12 @@ export default function UploadNow() {
         }
       );
 
+      console.log(response.data.cid, price, category);
+
       const saveDatasetCidResult = await saveDatasetCid(
         response.data.cid,
-        price
+        price,
+        +category
       );
 
       console.log(saveDatasetCidResult);
@@ -124,6 +131,26 @@ export default function UploadNow() {
             onChange={(e) => setPrice(e.target.value)}
             className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 p-3 text-lg"
           />
+        </div>
+
+        <div className="mt-6">
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Category
+          </label>
+          <select
+            id="category"
+            name="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 p-3 text-lg"
+          >
+            <option value="0">Finance</option>
+            <option value="1">Medicine</option>
+            <option value="2">Text</option>
+          </select>
         </div>
 
         {file && (

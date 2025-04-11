@@ -3,6 +3,7 @@ import Home from "../views/home/main";
 import GetStarted from "../views/get-started/main";
 import NotFound from "../views/not-found/main";
 import UploadNow from "../views/upload-now/main";
+import DiscoverDataset from "../views/discover-dataset/main";
 function Router() {
   const routes = [
     {
@@ -16,6 +17,10 @@ function Router() {
     {
       path: "/upload-now",
       element: <UploadNow />,
+    },
+    {
+      path: "/discover-dataset",
+      element: <DiscoverDataset />,
     },
     {
       path: "*",
