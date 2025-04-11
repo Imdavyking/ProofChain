@@ -6,6 +6,7 @@ import { SERVER_URL } from "../../utils/constants";
 import { toast } from "react-toastify";
 import Papa from "papaparse";
 import { saveDatasetCid } from "../../services/blockchain.services";
+import CSVPreview from "../csv-preview/main";
 export default function UploadNow() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
@@ -49,6 +50,9 @@ export default function UploadNow() {
 
     try {
       setisUploading(true);
+      setPreviewRows([]);
+      setError("");
+      setSuccess("");
 
       const socketId = crypto.randomUUID().replaceAll("-", "");
 
@@ -71,36 +75,38 @@ export default function UploadNow() {
         }
       );
 
-      console.log(response.data.cid, price, category);
+      const preview = await new Promise((resolve, reject) => {
+        Papa.parse(file, {
+          header: true,
+          complete: (results) => {
+            const allRows = results.data.filter(
+              (row) => Object.keys(row).length > 0
+            );
+            const preview = [];
 
-      Papa.parse(file, {
-        header: true,
-        complete: async (results) => {
-          const allRows = results.data.filter(
-            (row) => Object.keys(row).length > 0
-          );
-          const preview = [];
+            for (let i = 0; i < 3; i++) {
+              const randomIndex = Math.floor(Math.random() * allRows.length);
+              preview.push(allRows[randomIndex]);
+            }
 
-          for (let i = 0; i < 3; i++) {
-            const randomIndex = Math.floor(Math.random() * allRows.length);
-            preview.push(allRows[randomIndex]);
-          }
+            resolve(preview);
+          },
+          error: (error) => {
+            reject(error);
+          },
+        });
+      });
 
-          const saveDatasetCidResult = await saveDatasetCid({
-            cid: response.data.cid,
-            price,
-            category: +category,
-            preview:
-              typeof preview === "string" ? preview : JSON.stringify(preview),
-            title: file.name,
-          });
+      setError("");
 
-          console.log(saveDatasetCidResult);
-          setSuccess("✅ File uploaded successfully!");
-          setError("");
-
-          setPreviewRows(preview); // set this state and display below the file input
-        },
+      setPreviewRows(preview); // set this state and display below the file input
+      const saveDatasetCidResult = await saveDatasetCid({
+        cid: response.data.cid,
+        price,
+        category: +category,
+        preview:
+          typeof preview === "string" ? preview : JSON.stringify(preview),
+        title: file.name,
       });
     } catch (err) {
       console.error(err);
@@ -182,6 +188,7 @@ export default function UploadNow() {
           <div className="mt-4 text-green-600 text-sm">{success}</div>
         )}
 
+        <CSVPreview previewRows={preview} />
         <button
           onClick={handleUpload}
           disabled={!file || isUploading}
