@@ -17,6 +17,8 @@ contract DatasetMarketplace is ReentrancyGuard {
         uint256 downloads;
         uint256 createdAt;
         DatasetCategory category;
+        string title;
+        string preview;
     }
 
     uint256 public datasetCounter;
@@ -56,7 +58,9 @@ contract DatasetMarketplace is ReentrancyGuard {
     function uploadDataset(
         string calldata cid,
         uint256 price,
-        DatasetCategory category
+        DatasetCategory category,
+        string calldata preview,
+        string calldata title
     ) external {
         datasets[datasetCounter] = Dataset({
             owner: msg.sender,
@@ -66,7 +70,9 @@ contract DatasetMarketplace is ReentrancyGuard {
             starsCount: 0,
             createdAt: block.timestamp,
             downloads: 0,
-            category: category
+            category: category,
+            title: title,
+            preview: preview
         });
 
         emit DatasetCreated(

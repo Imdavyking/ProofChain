@@ -4,16 +4,15 @@ import { FaSpinner } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "../../utils/constants";
 import { toast } from "react-toastify";
-import {
-  DatasetCategory,
-  saveDatasetCid,
-} from "../../services/blockchain.services";
+import Papa from "papaparse";
+import { saveDatasetCid } from "../../services/blockchain.services";
 export default function UploadNow() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [category, setCategory] = useState("0");
   const [isUploading, setisUploading] = useState(false);
+  const [preview, setPreviewRows] = useState([]);
   const [price, setPrice] = useState(0);
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
@@ -74,16 +73,41 @@ export default function UploadNow() {
 
       console.log(response.data.cid, price, category);
 
-      const saveDatasetCidResult = await saveDatasetCid(
-        response.data.cid,
-        price,
-        +category
-      );
+      Papa.parse(file, {
+        header: true,
+        complete: async (results) => {
+          const allRows = results.data.filter(
+            (row) => Object.keys(row).length > 0
+          );
+          const preview = [];
 
-      console.log(saveDatasetCidResult);
-      setSuccess("✅ File uploaded successfully!");
-      setError("");
-      console.log(response.data);
+          for (let i = 0; i < 3; i++) {
+            const randomIndex = Math.floor(Math.random() * allRows.length);
+            preview.push(allRows[randomIndex]);
+          }
+
+          const saveDatasetCidResult = await saveDatasetCid(
+            response.data.cid,
+            price,
+            +category,
+            typeof preview === "string" ? preview : JSON.stringify(preview),
+            file.name
+          );
+
+          // cid: string;
+          // price: number | string;
+          // category: number | string;
+          // preview: string;
+          // description: string;
+          // title: string;
+
+          console.log(saveDatasetCidResult);
+          setSuccess("✅ File uploaded successfully!");
+          setError("");
+
+          setPreviewRows(preview); // set this state and display below the file input
+        },
+      });
     } catch (err) {
       console.error(err);
       setError("❌ Upload failed.");
