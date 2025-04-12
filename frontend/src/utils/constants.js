@@ -7,3 +7,5 @@ export const CURRENCY_NAME = import.meta.env.VITE_CHAIN_CURRENCY_NAME;
 export const CHAIN_SYMBOL = import.meta.env.VITE_CHAIN_SYMBOL;
 export const DATASET_CONTRACT_ADDRESS = import.meta.env
   .VITE_DATASET_CONTRACT_ADDRESS;
+export const LIT_PROTOCOL_IDENTIFIER = import.meta.env
+  .VITE_LIT_PROTOCOL_IDENTIFIER;

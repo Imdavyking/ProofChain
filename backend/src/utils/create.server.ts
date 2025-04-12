@@ -10,6 +10,7 @@ import { createServer } from "http";
 import { allowedOrigins } from "./constants";
 import { JWT_SECRET_KEY } from "../middlewares/auth";
 import csvRoutes from "../routes/csv.routes";
+import litRoutes from "../routes/lit.routes";
 
 dotenv.config();
 const app = express();
@@ -68,6 +69,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // Routes
 app.use("/api/upload-csv", csvRoutes);
+app.use("/api/lit-session", litRoutes);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

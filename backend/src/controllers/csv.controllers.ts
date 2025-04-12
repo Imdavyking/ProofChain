@@ -71,14 +71,14 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       status: "success",
     });
 
-    const datasetId = generateUniqueId().replace("-", "");
+    const litQueryId = generateUniqueId().replace("-", "");
 
     const evmContractConditions: any = [
       {
         contractAddress: environment.DATASET_CONTRACT_ADDRESS,
         chain: environment.LIT_PROTOCOL_IDENTIFIER,
         functionName: "canAccess",
-        functionParams: [datasetId, ":userAddress"],
+        functionParams: [litQueryId, ":userAddress"],
         functionAbi: {
           inputs: [
             { internalType: "uint256", name: "datasetId", type: "uint256" },
@@ -120,7 +120,7 @@ export const processCSVUpload = async (req: Request, res: Response) => {
     });
     const nftMetaJsonFile = new File(
       [nftMetaJsonBlob],
-      `encrypted-${datasetId}.json`,
+      `encrypted-${litQueryId}.json`,
       {
         type: "application/json",
       }

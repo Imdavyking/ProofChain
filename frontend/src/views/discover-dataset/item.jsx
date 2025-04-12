@@ -6,10 +6,12 @@ import {
   canAccess,
   purchaseAccess,
   rethrowFailedResponse,
-} from "../../services/blockchain.services";
+} from "../../services/blockchain.services.ts";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
-import axios from "axios";
+import axios from "../../services/axios.config.services.ts";
+import { signDataSetId } from "../../services/dataset.signature.services.ts";
+import { LIT_PROTOCOL_IDENTIFIER } from "../../utils/constants.js";
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,25 +26,33 @@ const DatasetItem = ({ dataset }) => {
       const response = "";
       const pinataUrl = `https://emerald-odd-bee-965.mypinata.cloud/ipfs/${dataset.cid}`;
       const fetchResult = await axios.get(pinataUrl);
-      const encryptedData = fetchResult.data;
-      // use lit protocol to decrypt the data
+      const { ciphertext, dataToEncryptHash } = fetchResult.data;
 
       const litNodeClient = new LitJsSdk.LitNodeClient({
         litNetwork: LIT_NETWORK.DatilTest,
         debug: false,
       });
       await litNodeClient.connect();
+      const signature = await signDataSetId(dataset.id);
+      const message = dataset.id;
+      const sessionResponse = await axios.post("/api/lit-session", {
+        signature,
+        message,
+      });
+      const { sessionSigs } = sessionResponse.data;
 
-      // const decryptedString = await litNodeClient.decrypt(
-      //   {
-      //     accessControlConditions,
-      //     chain: '',
-      //     ciphertext,
-      //     dataToEncryptHash,
-      //     sessionSigs,
-      //   },
-      //   this.litNodeClient
-      // );
+      const decryptedString = await litNodeClient.decrypt(
+        {
+          evmContractConditions,
+          chain: LIT_PROTOCOL_IDENTIFIER,
+          ciphertext,
+          dataToEncryptHash,
+          sessionSigs,
+        },
+        litNodeClient
+      );
+
+      console.log(decryptedString);
       rethrowFailedResponse(response);
       toast.success("Download started!");
       setCanAccessDataset(true);
