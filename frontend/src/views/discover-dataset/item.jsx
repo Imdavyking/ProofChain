@@ -31,7 +31,8 @@ const DatasetItem = ({ dataset }) => {
       const response = "";
       const pinataUrl = `https://emerald-odd-bee-965.mypinata.cloud/ipfs/${dataset.cid}`;
       const fetchResult = await axiosRequest.get(pinataUrl);
-      const { ciphertext, dataToEncryptHash } = fetchResult.data;
+      const { ciphertext, dataToEncryptHash, evmContractConditions } =
+        fetchResult.data;
 
       const litNodeClient = new LitJsSdk.LitNodeClient({
         litNetwork: LIT_NETWORK.DatilTest,
@@ -45,32 +46,6 @@ const DatasetItem = ({ dataset }) => {
         message,
       });
       const { sessionSigs } = sessionResponse.data;
-
-      const evmContractConditions = [
-        {
-          contractAddress: DATASET_CONTRACT_ADDRESS,
-          chain: LIT_PROTOCOL_IDENTIFIER,
-          functionName: "canAccess",
-          functionParams: [dataset.id, ":userAddress"],
-          functionAbi: {
-            inputs: [
-              { internalType: "string", name: "datasetId", type: "string" },
-              { internalType: "address", name: "user", type: "address" },
-            ],
-            name: "canAccess",
-            outputs: [
-              { internalType: "bool", name: "accessAccepted", type: "bool" },
-            ],
-            stateMutability: "view",
-            type: "function",
-          },
-          returnValueTest: {
-            key: "accessAccepted",
-            comparator: "=",
-            value: "true",
-          },
-        },
-      ];
 
       const decryptedString = await litNodeClient.decrypt(
         {

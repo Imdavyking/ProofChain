@@ -114,7 +114,11 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       status: "success",
     });
     const nftMetaJsonBuffer = Buffer.from(
-      JSON.stringify({ ciphertext, dataToEncryptHash }, null, 2)
+      JSON.stringify(
+        { ciphertext, dataToEncryptHash, evmContractConditions },
+        null,
+        2
+      )
     );
     const nftMetaJsonBlob = new Blob([nftMetaJsonBuffer], {
       type: "application/json",
