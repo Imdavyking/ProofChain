@@ -2,6 +2,7 @@ import { ellipsify } from "../../utils/ellipsify";
 import React, { useEffect, useState } from "react";
 import CSVPreview from "../csv-preview/main";
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
+import { LIT_NETWORK } from "@lit-protocol/constants";
 import {
   canAccess,
   purchaseAccess,
@@ -10,6 +11,7 @@ import {
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import axios from "../../services/axios.config.services.ts";
+import axiosRequest from "axios";
 import { signDataSetId } from "../../services/dataset.signature.services.ts";
 import {
   DATASET_CONTRACT_ADDRESS,
@@ -28,7 +30,7 @@ const DatasetItem = ({ dataset }) => {
       setIsLoading(true);
       const response = "";
       const pinataUrl = `https://emerald-odd-bee-965.mypinata.cloud/ipfs/${dataset.cid}`;
-      const fetchResult = await axios.get(pinataUrl);
+      const fetchResult = await axiosRequest.get(pinataUrl);
       const { ciphertext, dataToEncryptHash } = fetchResult.data;
 
       const litNodeClient = new LitJsSdk.LitNodeClient({
@@ -36,8 +38,8 @@ const DatasetItem = ({ dataset }) => {
         debug: false,
       });
       await litNodeClient.connect();
-      const signature = await signDataSetId(dataset.id);
       const message = dataset.id;
+      const signature = await signDataSetId(message);
       const sessionResponse = await axios.post("/api/lit-session", {
         signature,
         message,
