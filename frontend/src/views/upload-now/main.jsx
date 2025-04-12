@@ -103,8 +103,11 @@ export default function UploadNow() {
       setError("");
 
       setPreviewRows(preview); // set this state and display below the file input
+      const { cid, datasetId, signature } = response.data;
       const saveDatasetCidResult = await saveDatasetCid({
-        cid: response.data.cid,
+        cid,
+        datasetId,
+        signature,
         price,
         category: +category,
         preview:

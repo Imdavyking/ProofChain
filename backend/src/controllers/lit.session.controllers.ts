@@ -9,7 +9,7 @@ import { ethers } from "ethers";
 import { environment } from "../utils/config";
 import { uploadToPinata } from "../services/pinata.services";
 import io from "../utils/create.websocket";
-import { mintCapacityNFT } from "../services/mint.lit";
+import { mintCapacityNFT } from "../services/mint.lit.services";
 dotenv.config();
 
 export const getSessionSigs = async (req: Request, res: Response) => {

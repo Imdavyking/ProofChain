@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 contract DatasetMarketplace is ReentrancyGuard {
     enum DatasetCategory {
@@ -22,8 +24,11 @@ contract DatasetMarketplace is ReentrancyGuard {
         string id;
     }
 
-    mapping(string => Dataset) public datasets;
+    // datasetsArray
     Dataset[] public datasetsArray;
+
+    // datasetid => Dataset
+    mapping(string => Dataset) public datasets;
 
     // datasetId => buyer => hasAccess
     mapping(string => mapping(address => bool)) public hasAccess;
@@ -55,6 +60,10 @@ contract DatasetMarketplace is ReentrancyGuard {
     error DatasetMarketplace__AlreadyRated();
     error DatasetMarketplace__InvalidStarValue();
     error DatasetMarketplace__PaymentFailed();
+    error DatasetMarketplace__InvalidSignature();
+
+    address public constant backendSigAddress =
+        address(0x38dAFB5A3f0aBE1F4e3F45162B480142Aae29d38);
 
     function uploadDataset(
         string calldata datasetId,
@@ -62,7 +71,8 @@ contract DatasetMarketplace is ReentrancyGuard {
         uint256 price,
         DatasetCategory category,
         string calldata preview,
-        string calldata title
+        string calldata title,
+        bytes memory signature
     ) external {
         Dataset memory dataset = Dataset({
             owner: msg.sender,
@@ -79,6 +89,18 @@ contract DatasetMarketplace is ReentrancyGuard {
         });
         datasetsArray.push(dataset);
         datasets[datasetId] = dataset;
+
+        bytes32 messageHash = keccak256(abi.encodePacked(datasetId, cid));
+
+        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(
+            messageHash
+        );
+
+        if (
+            ECDSA.recover(ethSignedMessageHash, signature) != backendSigAddress
+        ) {
+            revert DatasetMarketplace__InvalidSignature();
+        }
 
         emit DatasetCreated(datasetId, msg.sender, cid, block.timestamp, price);
     }

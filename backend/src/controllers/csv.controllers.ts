@@ -9,6 +9,7 @@ import { ethers } from "ethers";
 import { environment } from "../utils/config";
 import { uploadToPinata } from "../services/pinata.services";
 import io from "../utils/create.websocket";
+import { signDataSetCid } from "../services/sign.dataset.services";
 dotenv.config();
 
 // Configure multer to accept only .csv files
@@ -71,14 +72,14 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       status: "success",
     });
 
-    const litQueryId = generateUniqueId().replace(/-/g, "");
+    const datasetId = generateUniqueId().replace(/-/g, "");
 
     const evmContractConditions: any = [
       {
         contractAddress: environment.DATASET_CONTRACT_ADDRESS,
         chain: environment.LIT_PROTOCOL_IDENTIFIER,
         functionName: "canAccess",
-        functionParams: [litQueryId, ":userAddress"],
+        functionParams: [datasetId, ":userAddress"],
         functionAbi: {
           inputs: [
             { internalType: "uint256", name: "datasetId", type: "uint256" },
@@ -120,7 +121,7 @@ export const processCSVUpload = async (req: Request, res: Response) => {
     });
     const nftMetaJsonFile = new File(
       [nftMetaJsonBlob],
-      `encrypted-${litQueryId}.json`,
+      `encrypted-${datasetId}.json`,
       {
         type: "application/json",
       }
@@ -145,8 +146,12 @@ export const processCSVUpload = async (req: Request, res: Response) => {
 
     const cid = pinataResponse.getUrl().split("/").pop();
 
+    const signature = await signDataSetCid(cid!, datasetId);
+
     res.status(200).json({
       cid,
+      datasetId,
+      signature,
     });
 
     return;
