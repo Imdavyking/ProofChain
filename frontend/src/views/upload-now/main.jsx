@@ -5,7 +5,10 @@ import { io } from "socket.io-client";
 import { SERVER_URL } from "../../utils/constants";
 import { toast } from "react-toastify";
 import Papa from "papaparse";
-import { saveDatasetCid } from "../../services/blockchain.services";
+import {
+  rethrowFailedResponse,
+  saveDatasetCid,
+} from "../../services/blockchain.services";
 import CSVPreview from "../csv-preview/main";
 export default function UploadNow() {
   const [file, setFile] = useState(null);
@@ -108,6 +111,7 @@ export default function UploadNow() {
           typeof preview === "string" ? preview : JSON.stringify(preview),
         title: file.name,
       });
+      rethrowFailedResponse(saveDatasetCidResult);
     } catch (err) {
       console.error(err);
       setError("❌ Upload failed.");

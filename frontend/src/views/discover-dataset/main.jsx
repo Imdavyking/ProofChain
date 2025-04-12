@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { getAllDatasets } from "../../services/blockchain.services";
 import { ethers } from "ethers";
-import { ellipsify } from "../../utils/ellipsify";
-import CSVPreview from "../csv-preview/main";
+import { FaSpinner } from "react-icons/fa";
+import DatasetItem from "./item";
 
 // Sample datasets for demo purposes
 
 function DiscoverDataset() {
   const [search, setSearch] = useState("");
+  const [isGettingDatasets, setIsGettingDatasets] = useState(false);
   const [filter, setFilter] = useState({
     category: "",
     verified: "",
@@ -17,29 +18,35 @@ function DiscoverDataset() {
   const [datasets, setDatasets] = useState([]);
   const [filteredDatasets, setFilteredDatasets] = useState([]);
   const getUserDatasets = async () => {
-    const datasets = await getAllDatasets();
-    const transformedDatasets = datasets.map((dataset) => ({
-      creator: dataset[0],
-      cid: dataset[1],
-      priceIntFIL: ethers.formatEther(dataset[2].toString()),
-      starsTotal: Number(dataset[3]),
-      starsCount: Number(dataset[4]),
-      rating:
-        Number(dataset[4]) == 0 ? 0 : Number(dataset[4]) / Number(dataset[3]),
-      downloads: Number(dataset[5]),
-      createdAt: Number(dataset[6]),
-      createdAtReadable: new Date(Number(dataset[6]) * 1000).toLocaleString(),
-      category: categories[Number(dataset[7])],
-      name: dataset[8],
-      description: dataset[8],
-      preview: dataset[9],
-      id: Number(dataset[10]),
-      verified: true,
-    }));
+    try {
+      setIsGettingDatasets(true);
+      const datasets = await getAllDatasets();
+      const transformedDatasets = datasets.map((dataset) => ({
+        creator: dataset[0],
+        cid: dataset[1],
+        priceIntFIL: ethers.formatEther(dataset[2].toString()),
+        starsTotal: Number(dataset[3]),
+        starsCount: Number(dataset[4]),
+        rating:
+          Number(dataset[4]) == 0 ? 0 : Number(dataset[4]) / Number(dataset[3]),
+        downloads: Number(dataset[5]),
+        createdAt: Number(dataset[6]),
+        createdAtReadable: new Date(Number(dataset[6]) * 1000).toLocaleString(),
+        category: categories[Number(dataset[7])],
+        name: dataset[8],
+        description: dataset[8],
+        preview: dataset[9],
+        id: Number(dataset[10]),
+        verified: true,
+      }));
 
-    setDatasets(transformedDatasets);
+      setDatasets(transformedDatasets);
 
-    return transformedDatasets;
+      return transformedDatasets;
+    } catch (error) {
+    } finally {
+      setIsGettingDatasets(false);
+    }
   };
   useEffect(() => {
     getUserDatasets();
@@ -108,32 +115,12 @@ function DiscoverDataset() {
         </select>
       </div>
 
+      {isGettingDatasets && <FaSpinner className="animate-spin  text-3xl" />}
+
       {/* Dataset Cards */}
       <div className="grid md:grid-cols-3 gap-6">
         {filteredDatasets.map((dataset) => (
-          <div key={dataset.id} className="bg-white p-5 rounded-lg shadow-lg">
-            <h3 className="text-xl font-semibold text-gray-800">
-              {dataset.name}
-            </h3>
-            <p className="text-gray-600 mt-2">{dataset.description}</p>
-            <p className="mt-4 text-gray-700">
-              <strong>Category:</strong> {dataset.category}
-            </p>
-            <p className="mt-2 text-gray-700">
-              <strong>Rating:</strong> {dataset.rating} ⭐
-            </p>
-            <p className="mt-2 text-gray-700">
-              <strong>Verified:</strong> {dataset.verified ? "Yes" : "No"}
-            </p>
-            <p className="mt-2 text-gray-700">
-              <strong>Creator:</strong> {ellipsify(dataset.creator)}
-            </p>
-            
-            <CSVPreview previewRows={JSON.parse(dataset.preview)} />
-            <button className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-              View Dataset
-            </button>
-          </div>
+          <DatasetItem dataset={dataset} key={dataset.id} />
         ))}
       </div>
 

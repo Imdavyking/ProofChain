@@ -151,7 +151,7 @@ export const saveDatasetCid = async ({
   } catch (error) {
     const parsedError = parseContractError(error, datasetMarketPlaceAbi);
     console.error("Error saving cid:", error);
-    return `${failedKey}${parsedError ?? error.message}`;
+    return `${failedKey}${parsedError?.name ?? error.message}`;
   }
 };
 
@@ -170,4 +170,54 @@ export const getAllDatasets = async () => {
     console.error("Error fetching datasets:", error);
     return [];
   }
+};
+
+export const purchaseAccess = async (datasetId: number) => {
+  try {
+    const datasetContract = await getDatasetContract();
+
+    if (!datasetContract) {
+      console.error("Failed to get dataset contract");
+      return;
+    }
+
+    const getDataset = await datasetContract.getDataset(datasetId);
+    const price = getDataset[1];
+
+    const transaction = await datasetContract.purchaseAccess(datasetId, {
+      value: price,
+    });
+    const receipt = await transaction.wait(1);
+    return `Purchased access with tx hash: ${receipt.transactionHash}`;
+  } catch (error) {
+    const parsedError = parseContractError(error, datasetMarketPlaceAbi);
+
+    console.error("Error purchasing access:", error);
+    return `${failedKey}${parsedError?.name ?? error.message}`;
+  }
+};
+
+export const canAccess = async (datasetId: number) => {
+  try {
+    const datasetContract = await getDatasetContract();
+    const userAddress = (await getSigner()).address;
+
+    if (!datasetContract) {
+      console.error("Failed to get dataset contract");
+      return;
+    }
+
+    const canAccess = await datasetContract.canAccess(datasetId, userAddress);
+    return canAccess;
+  } catch (error) {
+    console.error("Error checking access:", error);
+    return false;
+  }
+};
+
+export const rethrowFailedResponse = (response: string) => {
+  if (String(response).includes(failedKey)) {
+    throw new Error(response);
+  }
+  return response;
 };
