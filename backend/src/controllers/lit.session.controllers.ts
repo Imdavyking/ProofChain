@@ -15,7 +15,7 @@ dotenv.config();
 export const getSessionSigs = async (req: Request, res: Response) => {
   try {
     const dataSetABI = new ethers.Interface([
-      "function canAccess(uint256 datasetId, address user) external view returns (bool)",
+      "function canAccess(string calldata datasetId, address user) external view returns (bool)",
     ]);
     const { signature, message: datasetId } = req.body;
     const messageHash = ethers.solidityPackedKeccak256(
