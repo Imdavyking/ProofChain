@@ -28,6 +28,7 @@ export const secret: {
       "PINATA_JWT",
       "DATASET_CONTRACT_ADDRESS",
       "LIT_PROTOCOL_IDENTIFIER",
+      "PRIVATE_KEY",
     ];
 
     const loadedSecrets: Record<string, string> = {};

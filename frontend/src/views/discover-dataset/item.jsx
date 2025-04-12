@@ -1,6 +1,7 @@
 import { ellipsify } from "../../utils/ellipsify";
 import React, { useEffect, useState } from "react";
 import CSVPreview from "../csv-preview/main";
+import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import {
   canAccess,
   purchaseAccess,
@@ -8,12 +9,67 @@ import {
 } from "../../services/blockchain.services";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
+import axios from "axios";
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const canAccessCall = async () => {
     const userCanDownload = await canAccess(dataset.id);
     setCanAccessDataset(userCanDownload);
+  };
+
+  const downloadDataset = async () => {
+    try {
+      setIsLoading(true);
+      const response = "";
+      const pinataUrl = `https://emerald-odd-bee-965.mypinata.cloud/ipfs/${dataset.cid}`;
+      const fetchResult = await axios.get(pinataUrl);
+      const encryptedData = fetchResult.data;
+      // use lit protocol to decrypt the data
+
+      const litNodeClient = new LitJsSdk.LitNodeClient({
+        litNetwork: LIT_NETWORK.DatilTest,
+        debug: false,
+      });
+      await litNodeClient.connect();
+
+      // const decryptedString = await litNodeClient.decrypt(
+      //   {
+      //     accessControlConditions,
+      //     chain: '',
+      //     ciphertext,
+      //     dataToEncryptHash,
+      //     sessionSigs,
+      //   },
+      //   this.litNodeClient
+      // );
+      rethrowFailedResponse(response);
+      toast.success("Download started!");
+      setCanAccessDataset(true);
+    } catch (error) {
+      console.log(error.message);
+      console.error("Download failed", error);
+      toast.error(`Failed to download dataset ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const purchaseAccessOnChain = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await purchaseAccess(dataset.id);
+      rethrowFailedResponse(response);
+      toast.success("Access purchased successfully!");
+      setCanAccessDataset(true);
+    } catch (error) {
+      console.log(error.message);
+      console.error("Error purchasing access:", error);
+      toast.error(`Failed to purchase access. ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -39,24 +95,10 @@ const DatasetItem = ({ dataset }) => {
       <CSVPreview previewRows={JSON.parse(dataset.preview)} />
       <button
         className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        onClick={async () => {
-          try {
-            setIsPurchasing(true);
-            const response = await purchaseAccess(dataset.id);
-            rethrowFailedResponse(response);
-            toast.success("Access purchased successfully!");
-            setCanAccessDataset(true);
-          } catch (error) {
-            console.log(error.message);
-            console.error("Error purchasing access:", error);
-            toast.error(`Failed to purchase access. ${error.message}`);
-          } finally {
-            setIsPurchasing(false);
-          }
-        }}
-        disabled={isPurchasing}
+        onClick={canAccessDataset ? downloadDataset : purchaseAccessOnChain}
+        disabled={isLoading}
       >
-        {isPurchasing ? (
+        {isLoading ? (
           <FaSpinner className="animate-spin text-3xl" />
         ) : canAccessDataset ? (
           "Download Dataset"

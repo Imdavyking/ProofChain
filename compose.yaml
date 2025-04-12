@@ -19,6 +19,7 @@ services:
       - PINATA_JWT
       - DATASET_CONTRACT_ADDRESS
       - LIT_PROTOCOL_IDENTIFIER
+      - PRIVATE_KEY
     environment:
       - FRONTEND_URL=http://localhost:3000
     healthcheck:
@@ -90,6 +91,8 @@ secrets:
     file: ./backend/secrets/DATASET_CONTRACT_ADDRESS
   LIT_PROTOCOL_IDENTIFIER:
     file: ./backend/secrets/LIT_PROTOCOL_IDENTIFIER
+  PRIVATE_KEY:
+    file: ./backend/secrets/PRIVATE_KEY
 
 volumes:
   mongodb-data:

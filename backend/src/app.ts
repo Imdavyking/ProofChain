@@ -7,6 +7,7 @@ io.emit("connection", (data: any) => {
   logger.info(`user connected ${data}`);
 });
 import server from "./utils/create.server";
+import { mintCapacityNFT } from "./services/mint.lit";
 
 dotenv.config();
 
