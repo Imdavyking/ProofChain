@@ -54,7 +54,7 @@ const DatasetItem = ({ dataset }) => {
           functionParams: [dataset.id, ":userAddress"],
           functionAbi: {
             inputs: [
-              { internalType: "uint256", name: "datasetId", type: "uint256" },
+              { internalType: "string", name: "datasetId", type: "string" },
               { internalType: "address", name: "user", type: "address" },
             ],
             name: "canAccess",
