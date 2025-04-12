@@ -19,32 +19,32 @@ contract DatasetMarketplace is ReentrancyGuard {
         DatasetCategory category;
         string title;
         string preview;
-        uint256 id;
+        string id;
     }
 
-    uint256 public datasetCounter;
-    mapping(uint256 => Dataset) public datasets;
+    mapping(string => Dataset) public datasets;
+    Dataset[] public datasetsArray;
 
     // datasetId => buyer => hasAccess
-    mapping(uint256 => mapping(address => bool)) public hasAccess;
+    mapping(string => mapping(address => bool)) public hasAccess;
 
     // datasetId => user => hasRated
-    mapping(uint256 => mapping(address => bool)) public hasRated;
+    mapping(string => mapping(address => bool)) public hasRated;
 
     // datasetId => reviewId => review text
-    mapping(uint256 => mapping(uint256 => string)) public reviews;
+    mapping(string => mapping(uint256 => string)) public reviews;
 
     event DatasetCreated(
-        uint256 indexed id,
+        string indexed id,
         address indexed owner,
         string cid,
         uint256 createdAt,
         uint256 price
     );
-    event DatasetUpdated(uint256 indexed id, string newCid, uint256 newPrice);
-    event DatasetPurchased(uint256 indexed id, address indexed buyer);
-    event DatasetRated(uint256 indexed id, address indexed rater, uint8 stars);
-    event DatasetDownloaded(uint256 indexed id, address indexed user);
+    event DatasetUpdated(string indexed id, string newCid, uint256 newPrice);
+    event DatasetPurchased(string indexed id, address indexed buyer);
+    event DatasetRated(string indexed id, address indexed rater, uint8 stars);
+    event DatasetDownloaded(string indexed id, address indexed user);
 
     error DatasetMarketplace__NotDatasetOwner();
     error DatasetMarketplace__InsufficientPayment();
@@ -57,13 +57,14 @@ contract DatasetMarketplace is ReentrancyGuard {
     error DatasetMarketplace__PaymentFailed();
 
     function uploadDataset(
+        string calldata datasetId,
         string calldata cid,
         uint256 price,
         DatasetCategory category,
         string calldata preview,
         string calldata title
     ) external {
-        datasets[datasetCounter] = Dataset({
+        Dataset memory dataset = Dataset({
             owner: msg.sender,
             cid: cid,
             price: price,
@@ -74,27 +75,19 @@ contract DatasetMarketplace is ReentrancyGuard {
             category: category,
             title: title,
             preview: preview,
-            id: datasetCounter
+            id: datasetId
         });
+        datasetsArray.push(dataset);
+        datasets[datasetId] = dataset;
 
-        emit DatasetCreated(
-            datasetCounter,
-            msg.sender,
-            cid,
-            block.timestamp,
-            price
-        );
-        datasetCounter++;
+        emit DatasetCreated(datasetId, msg.sender, cid, block.timestamp, price);
     }
 
     function updateDataset(
-        uint256 datasetId,
+        string calldata datasetId,
         string calldata newCid,
         uint256 newPrice
     ) external {
-        if (datasetId >= datasetCounter)
-            revert DatasetMarketplace__InvalidDatasetId();
-
         Dataset storage dataset = datasets[datasetId];
         if (dataset.owner != msg.sender)
             revert DatasetMarketplace__NotDatasetOwner();
@@ -108,10 +101,9 @@ contract DatasetMarketplace is ReentrancyGuard {
         emit DatasetUpdated(datasetId, newCid, newPrice);
     }
 
-    function purchaseAccess(uint256 datasetId) external payable nonReentrant {
-        if (datasetId >= datasetCounter)
-            revert DatasetMarketplace__DatasetNotFound();
-
+    function purchaseAccess(
+        string calldata datasetId
+    ) external payable nonReentrant {
         Dataset memory dataset = datasets[datasetId];
         if (msg.value < dataset.price)
             revert DatasetMarketplace__InsufficientPayment();
@@ -130,7 +122,7 @@ contract DatasetMarketplace is ReentrancyGuard {
     }
 
     function canAccess(
-        uint256 datasetId,
+        string calldata datasetId,
         address user
     ) external view returns (bool) {
         return hasAccess[datasetId][user];
@@ -141,14 +133,11 @@ contract DatasetMarketplace is ReentrancyGuard {
         view
         returns (Dataset[] memory allDatasets)
     {
-        allDatasets = new Dataset[](datasetCounter);
-        for (uint256 i = 0; i < datasetCounter; i++) {
-            allDatasets[i] = datasets[i];
-        }
+        return datasetsArray;
     }
 
     function getDataset(
-        uint256 datasetId
+        string calldata datasetId
     )
         external
         view
@@ -173,9 +162,7 @@ contract DatasetMarketplace is ReentrancyGuard {
     }
 
     /// ⭐ Users can rate a dataset (once)
-    function rateDataset(uint256 datasetId, uint8 stars) external {
-        if (datasetId >= datasetCounter)
-            revert DatasetMarketplace__DatasetNotFound();
+    function rateDataset(string calldata datasetId, uint8 stars) external {
         if (stars < 1 || stars > 5)
             revert DatasetMarketplace__InvalidStarValue();
         if (hasRated[datasetId][msg.sender])
@@ -190,7 +177,7 @@ contract DatasetMarketplace is ReentrancyGuard {
     }
 
     /// ⬇️ Increase download count
-    function recordDownload(uint256 datasetId) external {
+    function recordDownload(string calldata datasetId) external {
         if (!hasAccess[datasetId][msg.sender])
             revert DatasetMarketplace__AccessDenied();
 

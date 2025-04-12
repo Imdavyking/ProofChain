@@ -71,7 +71,7 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       status: "success",
     });
 
-    const litQueryId = generateUniqueId().replace("-", "");
+    const litQueryId = generateUniqueId().replace(/-/g, "");
 
     const evmContractConditions: any = [
       {
