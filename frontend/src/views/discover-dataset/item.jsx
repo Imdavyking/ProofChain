@@ -11,7 +11,10 @@ import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import axios from "../../services/axios.config.services.ts";
 import { signDataSetId } from "../../services/dataset.signature.services.ts";
-import { LIT_PROTOCOL_IDENTIFIER } from "../../utils/constants.js";
+import {
+  DATASET_CONTRACT_ADDRESS,
+  LIT_PROTOCOL_IDENTIFIER,
+} from "../../utils/constants.js";
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +43,32 @@ const DatasetItem = ({ dataset }) => {
         message,
       });
       const { sessionSigs } = sessionResponse.data;
+
+      const evmContractConditions = [
+        {
+          contractAddress: DATASET_CONTRACT_ADDRESS,
+          chain: LIT_PROTOCOL_IDENTIFIER,
+          functionName: "canAccess",
+          functionParams: [dataset.id, ":userAddress"],
+          functionAbi: {
+            inputs: [
+              { internalType: "uint256", name: "datasetId", type: "uint256" },
+              { internalType: "address", name: "user", type: "address" },
+            ],
+            name: "canAccess",
+            outputs: [
+              { internalType: "bool", name: "accessAccepted", type: "bool" },
+            ],
+            stateMutability: "view",
+            type: "function",
+          },
+          returnValueTest: {
+            key: "accessAccepted",
+            comparator: "=",
+            value: "true",
+          },
+        },
+      ];
 
       const decryptedString = await litNodeClient.decrypt(
         {
