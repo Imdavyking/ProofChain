@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getAllDatasets } from "../../services/blockchain.services";
 import { ethers } from "ethers";
+import { ellipsify } from "../../utils/ellipsify";
+import CSVPreview from "../csv-preview/main";
 
 // Sample datasets for demo purposes
 
@@ -11,6 +13,7 @@ function DiscoverDataset() {
     verified: "",
     rating: "",
   });
+  const categories = ["Finance", "Medicine", "Text"];
   const [datasets, setDatasets] = useState([]);
   const [filteredDatasets, setFilteredDatasets] = useState([]);
   const getUserDatasets = async () => {
@@ -26,7 +29,7 @@ function DiscoverDataset() {
       downloads: Number(dataset[5]),
       createdAt: Number(dataset[6]),
       createdAtReadable: new Date(Number(dataset[6]) * 1000).toLocaleString(),
-      category: Number(dataset[7]),
+      category: categories[Number(dataset[7])],
       name: dataset[8],
       description: dataset[8],
       preview: dataset[9],
@@ -79,7 +82,7 @@ function DiscoverDataset() {
           value={filter.category}
         >
           <option value="">Category</option>
-          <option value="Medical">Medical</option>
+          <option value="Medicine">Medicine</option>
           <option value="Finance">Finance</option>
           <option value="Text">Text</option>
         </select>
@@ -123,8 +126,10 @@ function DiscoverDataset() {
               <strong>Verified:</strong> {dataset.verified ? "Yes" : "No"}
             </p>
             <p className="mt-2 text-gray-700">
-              <strong>Creator:</strong> {dataset.creator}
+              <strong>Creator:</strong> {ellipsify(dataset.creator)}
             </p>
+            
+            <CSVPreview previewRows={JSON.parse(dataset.preview)} />
             <button className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
               View Dataset
             </button>
