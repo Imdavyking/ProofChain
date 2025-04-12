@@ -155,7 +155,7 @@ export const saveDatasetCid = async ({
   }
 };
 
-const getAllDatasets = async () => {
+export const getAllDatasets = async () => {
   try {
     const datasetContract = await getDatasetContract();
 

@@ -19,6 +19,7 @@ contract DatasetMarketplace is ReentrancyGuard {
         DatasetCategory category;
         string title;
         string preview;
+        uint256 id;
     }
 
     uint256 public datasetCounter;
@@ -72,7 +73,8 @@ contract DatasetMarketplace is ReentrancyGuard {
             downloads: 0,
             category: category,
             title: title,
-            preview: preview
+            preview: preview,
+            id: datasetCounter
         });
 
         emit DatasetCreated(

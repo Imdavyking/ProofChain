@@ -1,36 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { getAllDatasets } from "../../services/blockchain.services";
+import { ethers } from "ethers";
 
 // Sample datasets for demo purposes
-const datasets = [
-  {
-    id: 1,
-    name: "Medical Imaging Data",
-    description: "A large collection of medical images.",
-    category: "Medical",
-    rating: 4.5,
-    verified: true,
-    creator: "John Doe",
-  },
-  {
-    id: 2,
-    name: "Financial Data 2020",
-    description: "Stock market data from 2020.",
-    category: "Finance",
-    rating: 4.2,
-    verified: true,
-    creator: "Jane Smith",
-  },
-  {
-    id: 3,
-    name: "Text Sentiment Dataset",
-    description: "Dataset for training sentiment analysis models.",
-    category: "Text",
-    rating: 4.7,
-    verified: false,
-    creator: "Alice Johnson",
-  },
-  // More datasets here...
-];
 
 function DiscoverDataset() {
   const [search, setSearch] = useState("");
@@ -39,10 +11,38 @@ function DiscoverDataset() {
     verified: "",
     rating: "",
   });
-  const [filteredDatasets, setFilteredDatasets] = useState(datasets);
+  const [datasets, setDatasets] = useState([]);
+  const [filteredDatasets, setFilteredDatasets] = useState([]);
+  const getUserDatasets = async () => {
+    const datasets = await getAllDatasets();
+    const transformedDatasets = datasets.map((dataset) => ({
+      creator: dataset[0],
+      cid: dataset[1],
+      priceIntFIL: ethers.formatEther(dataset[2].toString()),
+      starsTotal: Number(dataset[3]),
+      starsCount: Number(dataset[4]),
+      rating:
+        Number(dataset[4]) == 0 ? 0 : Number(dataset[4]) / Number(dataset[3]),
+      downloads: Number(dataset[5]),
+      createdAt: Number(dataset[6]),
+      createdAtReadable: new Date(Number(dataset[6]) * 1000).toLocaleString(),
+      category: Number(dataset[7]),
+      name: dataset[8],
+      description: dataset[8],
+      preview: dataset[9],
+      id: Number(dataset[10]),
+      verified: true,
+    }));
 
+    setDatasets(transformedDatasets);
+
+    return transformedDatasets;
+  };
   useEffect(() => {
-    // Filter datasets based on the search and filter criteria
+    getUserDatasets();
+  }, []);
+  useEffect(() => {
+    if (!datasets.length) return;
     let filtered = datasets.filter((dataset) => {
       return (
         dataset.name.toLowerCase().includes(search.toLowerCase()) &&
@@ -54,7 +54,7 @@ function DiscoverDataset() {
       );
     });
     setFilteredDatasets(filtered);
-  }, [search, filter]);
+  }, [search, filter, datasets]);
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-5">
