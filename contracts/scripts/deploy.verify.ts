@@ -52,17 +52,6 @@ async function main() {
    */
   // .envs
   updateEnv(datasetMarketplaceAddress, "backend", "DATASET_CONTRACT_ADDRESS");
-
-  /**
-   * Indexer
-   */
-  // .envs
-  updateEnv(blockNumber.toString(), "indexer", "BLOCK_NUMBER");
-  updateEnv(chainId!.toString()!, "indexer", "CHAIN_ID");
-  updateEnv(rpcUrl, "indexer", "RPC_URL");
-  updateEnv(datasetMarketplaceAddress, "indexer", "CONTRACT_ADDRESS");
-  // abis
-  copyABI("DatasetMarketplace", "indexer/abis", "abi");
 }
 
 main().catch(console.error);
