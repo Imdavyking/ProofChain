@@ -149,7 +149,25 @@ export const saveDatasetCid = async ({
     const receipt = await transaction.wait(1);
     return `Uploaded dataset with tx hash: ${receipt.transactionHash}`;
   } catch (error) {
+    const parsedError = parseContractError(error, datasetMarketPlaceAbi);
     console.error("Error saving cid:", error);
-    return `${failedKey}${error.message}`;
+    return `${failedKey}${parsedError ?? error.message}`;
+  }
+};
+
+const getAllDatasets = async () => {
+  try {
+    const datasetContract = await getDatasetContract();
+
+    if (!datasetContract) {
+      console.error("Failed to get dataset contract");
+      return;
+    }
+
+    const allDatasets = await datasetContract.getAllDatasets();
+    return allDatasets;
+  } catch (error) {
+    console.error("Error fetching datasets:", error);
+    return [];
   }
 };

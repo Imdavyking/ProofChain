@@ -134,6 +134,17 @@ contract DatasetMarketplace is ReentrancyGuard {
         return hasAccess[datasetId][user];
     }
 
+    function getAllDatasets()
+        external
+        view
+        returns (Dataset[] memory allDatasets)
+    {
+        allDatasets = new Dataset[](datasetCounter);
+        for (uint256 i = 0; i < datasetCounter; i++) {
+            allDatasets[i] = datasets[i];
+        }
+    }
+
     function getDataset(
         uint256 datasetId
     )

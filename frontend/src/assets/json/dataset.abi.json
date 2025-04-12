@@ -276,6 +276,71 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getAllDatasets",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "cid",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "starsTotal",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "starsCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "downloads",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum DatasetMarketplace.DatasetCategory",
+            "name": "category",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "preview",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct DatasetMarketplace.Dataset[]",
+        "name": "allDatasets",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
