@@ -1,14 +1,8 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import * as LitJsSdk from "@lit-protocol/lit-node-client";
-import { LIT_NETWORK } from "@lit-protocol/constants";
-import multer from "multer";
-import path from "path";
 import logger from "../config/logger";
 import { ethers } from "ethers";
 import { environment } from "../utils/config";
-import { uploadToPinata } from "../services/pinata.services";
-import io from "../utils/create.websocket";
 import { mintCapacityNFT } from "../services/mint.lit.services";
 dotenv.config();
 
@@ -27,11 +21,15 @@ export const getSessionSigs = async (req: Request, res: Response) => {
       ethers.getBytes(messageHash)
     );
     const userAddress = ethers.recoverAddress(ethSignedMessageHash, signature);
-
+    const provider = new ethers.JsonRpcProvider(environment.RPC_URL);
+    const signer = new ethers.Wallet(environment.PRIVATE_KEY, provider);
     const dataSetContract = new ethers.Contract(
       environment.DATASET_CONTRACT_ADDRESS,
-      dataSetABI
+      dataSetABI,
+      signer
     );
+
+    console.log({ dataSetContract, userAddress });
 
     const canAccess = await dataSetContract.canAccess(datasetId, userAddress);
 

@@ -20,6 +20,7 @@ services:
       - DATASET_CONTRACT_ADDRESS
       - LIT_PROTOCOL_IDENTIFIER
       - PRIVATE_KEY
+      - RPC_URL
     environment:
       - FRONTEND_URL=http://localhost:3000
     healthcheck:
@@ -93,6 +94,8 @@ secrets:
     file: ./backend/secrets/LIT_PROTOCOL_IDENTIFIER
   PRIVATE_KEY:
     file: ./backend/secrets/PRIVATE_KEY
+  RPC_URL:
+    file: ./backend/secrets/RPC_URL
 
 volumes:
   mongodb-data:

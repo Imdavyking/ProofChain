@@ -29,6 +29,7 @@ export const secret: {
       "DATASET_CONTRACT_ADDRESS",
       "LIT_PROTOCOL_IDENTIFIER",
       "PRIVATE_KEY",
+      "RPC_URL",
     ];
 
     const loadedSecrets: Record<string, string> = {};
