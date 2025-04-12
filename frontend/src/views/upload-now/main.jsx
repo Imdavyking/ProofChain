@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "../../services/axios.config";
+import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "../../utils/constants";
