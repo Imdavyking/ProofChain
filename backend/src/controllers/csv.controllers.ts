@@ -146,7 +146,13 @@ export const processCSVUpload = async (req: Request, res: Response) => {
 
     const cid = pinataResponse.getUrl().split("/").pop();
 
-    const signature = await signDataSetCid(cid!, datasetId);
+    const { signature } = await signDataSetCid(cid!, datasetId);
+
+    console.log({
+      cid,
+      datasetId,
+      signature,
+    });
 
     res.status(200).json({
       cid,

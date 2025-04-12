@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axios from "../../services/axios.config.services";
 import { FaSpinner } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "../../utils/constants";
@@ -116,7 +116,7 @@ export default function UploadNow() {
       });
       rethrowFailedResponse(saveDatasetCidResult);
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
       setError("❌ Upload failed.");
       setSuccess("");
     } finally {
