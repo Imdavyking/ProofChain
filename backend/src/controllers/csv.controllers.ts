@@ -55,7 +55,7 @@ export const processCSVUpload = async (req: Request, res: Response) => {
 
     const litNodeClient = new LitJsSdk.LitNodeClientNodeJs({
       alertWhenUnauthorized: false,
-      litNetwork: LIT_NETWORK.Datil,
+      litNetwork: LIT_NETWORK.DatilTest,
       debug: false,
     });
 
