@@ -7,7 +7,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "@nomicfoundation/hardhat-verify";
 import { HardhatEthersProvider } from "@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider";
 
-const wallet = initKeystore(null);
+export const wallet = initKeystore(null);
 
 const RPC_URL = process.env.RPC_URL;
 const CHAIN_ID = process.env.CHAIN_ID;

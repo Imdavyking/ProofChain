@@ -1,8 +1,10 @@
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { DatasetMarketplace } from "../typechain-types";
 import { ContractTransactionResponse } from "ethers";
+import { initKeystore } from "../utils/init.keystore";
+import { wallet } from "../hardhat.config";
 
 describe("DatasetMarketplace", function () {
   let marketplace: DatasetMarketplace & {
@@ -12,11 +14,22 @@ describe("DatasetMarketplace", function () {
     user1: HardhatEthersSigner,
     user2: HardhatEthersSigner;
   const dataSetId = crypto.randomUUID().replace(/-/g, "");
+  let signature: string;
 
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
     const Marketplace = await ethers.getContractFactory("DatasetMarketplace");
     marketplace = await Marketplace.deploy();
+    await marketplace.waitForDeployment();
+
+    const ethSignedMessageproofHash = ethers.solidityPackedKeccak256(
+      ["string", "string"],
+      [dataSetId, "cid1"]
+    );
+
+    signature = await wallet.signMessage(
+      ethers.getBytes(ethSignedMessageproofHash)
+    );
   });
 
   it("should allow uploading datasets", async function () {
@@ -28,7 +41,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     const dataset = await marketplace.datasets(dataSetId);
     expect(dataset.cid).to.equal("cid1");
@@ -44,7 +58,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await marketplace
       .connect(user1)
@@ -63,7 +78,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await expect(
       marketplace
@@ -84,7 +100,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await marketplace
       .connect(user2)
@@ -102,7 +119,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await expect(
       marketplace
@@ -123,7 +141,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await marketplace.connect(user2).rateDataset(dataSetId, 4);
     const dataset = await marketplace.datasets(dataSetId);
@@ -140,7 +159,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await marketplace.connect(user2).rateDataset(dataSetId, 4);
     await expect(
@@ -160,7 +180,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await marketplace
       .connect(user2)
@@ -179,7 +200,8 @@ describe("DatasetMarketplace", function () {
         ethers.parseEther("1"),
         0,
         "preview",
-        "title"
+        "title",
+        signature
       );
     await expect(
       marketplace.connect(user2).recordDownload(dataSetId)
