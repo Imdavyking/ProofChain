@@ -36,7 +36,7 @@ function DiscoverDataset() {
         name: dataset[8],
         description: dataset[8],
         preview: dataset[9],
-        id: Number(dataset[10]),
+        id: dataset[10],
         verified: true,
       }));
 

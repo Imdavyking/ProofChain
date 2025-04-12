@@ -96,6 +96,7 @@ const DatasetItem = ({ dataset }) => {
 
   const purchaseAccessOnChain = async () => {
     try {
+      console.log(dataset);
       setIsLoading(true);
 
       const response = await purchaseAccess(dataset.id);
