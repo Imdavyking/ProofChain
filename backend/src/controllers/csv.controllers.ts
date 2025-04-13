@@ -86,14 +86,12 @@ export const processCSVUpload = async (req: Request, res: Response) => {
             { internalType: "address", name: "user", type: "address" },
           ],
           name: "canAccess",
-          outputs: [
-            { internalType: "bool", name: "accessAccepted", type: "bool" },
-          ],
+          outputs: [{ internalType: "bool", name: "", type: "bool" }],
           stateMutability: "view",
           type: "function",
         },
         returnValueTest: {
-          key: "accessAccepted",
+          key: "",
           comparator: "=",
           value: "true",
         },

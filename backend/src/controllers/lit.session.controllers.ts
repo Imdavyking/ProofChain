@@ -29,8 +29,6 @@ export const getSessionSigs = async (req: Request, res: Response) => {
       signer
     );
 
-    console.log({ dataSetContract, userAddress });
-
     const canAccess = await dataSetContract.canAccess(datasetId, userAddress);
 
     if (!canAccess) {
