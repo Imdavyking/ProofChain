@@ -61,7 +61,7 @@ export const mintCapacityNFT = async () => {
 
     console.log("🔄 Getting Session Sigs via an Auth Sig...");
     const sessionSignatures = await litNodeClient.getSessionSigs({
-      chain: "ethereum",
+      chain: environment.LIT_PROTOCOL_IDENTIFIER,
       expiration: new Date(Date.now() + 1000 * 60 * 10).toISOString(), // 10 minutes
       capabilityAuthSigs: [capacityDelegationAuthSig],
       resourceAbilityRequests: [
@@ -90,7 +90,9 @@ export const mintCapacityNFT = async () => {
         });
       },
     });
-    console.log(`✅ Got Session Sigs via an Auth Sig ${JSON.stringify(sessionSignatures)}`);
+    console.log(
+      `✅ Got Session Sigs via an Auth Sig ${JSON.stringify(sessionSignatures)}`
+    );
     return sessionSignatures;
   } catch (error) {
     console.log(error);
