@@ -13,7 +13,7 @@ export const mintCapacityNFT = async () => {
   try {
     const ethersSigner = new ethers.Wallet(
       environment.PRIVATE_KEY,
-      new ethers.JsonRpcProvider(LIT_RPC.CHRONICLE_YELLOWSTONE)
+      new ethers.JsonRpcProvider(environment.RPC_URL)
     );
 
     ethersSigner.provider?.getBlockNumber().then((blockNumber) => {

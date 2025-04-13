@@ -63,7 +63,7 @@ const DatasetItem = ({ dataset }) => {
       toast.success("Download started!");
       setCanAccessDataset(true);
     } catch (error) {
-      console.log(error.message);
+      console.log(JSON.stringify(error.message));
       console.error("Download failed", error);
       toast.error(`Failed to download dataset ${error.message}`);
     } finally {
