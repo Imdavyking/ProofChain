@@ -80,3 +80,7 @@ tackle
 
 Build the future of AI on with decentralized storage on filecoin,enhancing data provenance,privacy,efficiency,and interoperability.
 
+
+
+Akave
+app that upload dataset, and train models against them with self custody wallet
