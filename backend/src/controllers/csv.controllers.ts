@@ -177,11 +177,9 @@ export const processCSVUpload = async (req: Request, res: Response) => {
             randMuCiphertext.u.y[1].toString(),
           ],
         },
-        v: randMuCiphertext.v,
-        w: randMuCiphertext.w,
+        v: ethers.hexlify(randMuCiphertext.v),
+        w: ethers.hexlify(randMuCiphertext.w),
       };
-
-      console.log({ randMuCiphertextTx });
 
       res.status(200).json({
         cid,
