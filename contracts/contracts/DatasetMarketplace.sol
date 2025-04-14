@@ -150,6 +150,7 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
         // Update the dataset with the decrypted CID
         datasets[datasetId].cid = cid;
         datasets[datasetId].isEncrypted = false;
+        datasets[datasetId].decryptionBlockNumber = 0;
         // loop through the datasetsArray to find the dataset
         for (uint256 i = 0; i < datasetsArray.length; i++) {
             if (
@@ -158,6 +159,7 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
             ) {
                 datasetsArray[i].cid = cid;
                 datasetsArray[i].isEncrypted = false;
+                datasetsArray[i].decryptionBlockNumber = 0;
                 break;
             }
         }
