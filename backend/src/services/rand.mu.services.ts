@@ -16,7 +16,5 @@ export const encryptCid = async (cid: string, extraBlocks: number) => {
   // Encrypt the encoded message
   const randMuCiphertext = blocklockjs.encrypt(encodedMessage, blockHeight);
 
-  // Call `createTimelockRequest` on the user's contract
-
   return { randMuCiphertext, blockHeight };
 };
