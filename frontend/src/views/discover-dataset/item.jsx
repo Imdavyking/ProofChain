@@ -18,6 +18,8 @@ import { LIT_PROTOCOL_IDENTIFIER } from "../../utils/constants.js";
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [inputRow, setInputRow] = useState({});
+  const [prediction, setPrediction] = useState(null);
   const [isTraining, setIsTraining] = useState(false);
   const [targetColumn, setTargetColumn] = useState("");
   const [modelType, setModelType] = useState("LinearRegression");
@@ -60,17 +62,25 @@ const DatasetItem = ({ dataset }) => {
       // dataset_id = data.get("dataset_id");
       // input_data = data.get("input_data");
 
-      const predict = await axiosRequest.post(`http://127.0.0.1:5000/predict`, {
-        dataset_id: dataset.id,
-      });
-
       console.log(`Training response: ${trainingResponse.data}`);
 
-      // csv_data = data.get('csv_data')
-      // model_type = data.get('model_type')
-      // target_column = data.get('target_column')
-      // dataset_id = data.get('dataset_id')
-      // Parse CSV and set columns for target column selection
+      if (!inputRow) {
+        toast.error("Please enter input data for prediction.");
+        return;
+      }
+
+      const trimmedInputRow = Object.fromEntries(
+        Object.entries(inputRow).map(([key, value]) => [key.trim(), value])
+      );
+
+      const predict = await axiosRequest.post(`http://127.0.0.1:5000/predict`, {
+        dataset_id: dataset.id,
+        input_data: trimmedInputRow,
+      });
+
+      setPrediction(predict.data);
+
+      console.log(`Prediction response: ${predict.data}`);
     } catch (error) {
       console.error("Error during train and predict:", error);
       toast.error("Failed to fetch or process dataset for training.");
@@ -177,6 +187,33 @@ const DatasetItem = ({ dataset }) => {
 
       <CSVPreview previewRows={JSON.parse(dataset.preview)} />
 
+      {csvData && targetColumn && (
+        <div className="mt-4">
+          <h4 className="font-semibold text-gray-700 mb-2">
+            Enter Custom Input Row (excluding target column)
+          </h4>
+
+          {columns
+            .filter((col) => col !== targetColumn)
+            .map((col, index) => (
+              <div key={index} className="mb-2">
+                <label className="block text-gray-600">{col}</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded-lg"
+                  value={inputRow[col] || ""}
+                  onChange={(e) =>
+                    setInputRow((prev) => ({
+                      ...prev,
+                      [col]: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            ))}
+        </div>
+      )}
+
       {csvData && (
         <div className="mt-4">
           <h4 className="font-semibold text-gray-700">Train and Predict</h4>
@@ -210,6 +247,16 @@ const DatasetItem = ({ dataset }) => {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="mt-2">
+            <label className="block text-gray-600">Prediction Result</label>
+            <textarea
+              className="w-full p-2 border rounded-lg mt-2"
+              value={prediction ? JSON.stringify(prediction, null, 2) : ""}
+              readOnly
+              rows={4}
+            />
           </div>
 
           <button
