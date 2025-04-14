@@ -71,7 +71,7 @@ npm install react @web3uikit/core ipfs-http-client
 
 ### **3. Monetize the Dataset**
 
-- Datasets are **tokenized** and can be accessed by paying with the **ProofChain token**.
+- Datasets are **tokenized** and can be accessed by paying with the **tFil**.
 - **Smart contracts** manage payments, with 100% of the revenue going directly to the dataset contributor.
 
 ### **4. Peer Review and Validation**
