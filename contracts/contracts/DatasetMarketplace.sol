@@ -3,8 +3,12 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+// Import the Types library for managing ciphertexts
+import {TypesLib} from "blocklock-solidity/src/libraries/TypesLib.sol";
+// Import the AbstractBlocklockReceiver for handling timelock decryption callbacks
+import {AbstractBlocklockReceiver} from "blocklock-solidity/src/AbstractBlocklockReceiver.sol";
 
-contract DatasetMarketplace is ReentrancyGuard {
+contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
     enum DatasetCategory {
         Finance,
         Medicine,
@@ -23,6 +27,9 @@ contract DatasetMarketplace is ReentrancyGuard {
         string title;
         string preview;
         string id;
+        bool isEncrypted;
+        TypesLib.Ciphertext ciphertext;
+        uint256 decryptionBlockNumber;
     }
 
     // datasetsArray
@@ -33,6 +40,9 @@ contract DatasetMarketplace is ReentrancyGuard {
 
     // datasetId => buyer => hasAccess
     mapping(string => mapping(address => bool)) public hasAccess;
+
+    // requestId => datasetId
+    mapping(uint256 => string) public requestIdToDatasetId;
 
     // datasetId => user => hasRated
     mapping(string => mapping(address => bool)) public hasRated;
@@ -62,9 +72,95 @@ contract DatasetMarketplace is ReentrancyGuard {
     error DatasetMarketplace__InvalidStarValue();
     error DatasetMarketplace__PaymentFailed();
     error DatasetMarketplace__InvalidSignature();
+    error DatasetMarketplace__DatasetNotEncrypted();
 
     address public constant backendSigAddress =
         address(0x38dAFB5A3f0aBE1F4e3F45162B480142Aae29d38);
+
+    constructor(
+        address blocklockContract
+    ) AbstractBlocklockReceiver(blocklockContract) {}
+
+    function uploadEncryptedDataset(
+        string calldata datasetId,
+        TypesLib.Ciphertext calldata ciphertext,
+        uint256 price,
+        DatasetCategory category,
+        string calldata preview,
+        string calldata title,
+        uint256 decryptionBlockNumber,
+        bytes memory signature
+    ) external {
+        Dataset memory dataset = Dataset({
+            owner: msg.sender,
+            cid: "",
+            price: price,
+            starsTotal: 0,
+            starsCount: 0,
+            downloads: 0,
+            createdAt: block.timestamp,
+            category: category,
+            title: title,
+            preview: preview,
+            id: datasetId,
+            isEncrypted: true,
+            ciphertext: ciphertext,
+            decryptionBlockNumber: decryptionBlockNumber
+        });
+
+        datasetsArray.push(dataset);
+        datasets[datasetId] = dataset;
+
+        // Store the requestId to datasetId mapping
+        uint256 requestId = blocklock.requestBlocklock(
+            decryptionBlockNumber,
+            ciphertext
+        );
+        requestIdToDatasetId[requestId] = datasetId;
+
+        bytes32 messageHash = keccak256(abi.encodePacked(datasetId));
+        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(
+            messageHash
+        );
+        if (
+            ECDSA.recover(ethSignedMessageHash, signature) != backendSigAddress
+        ) {
+            revert DatasetMarketplace__InvalidSignature();
+        }
+
+        emit DatasetCreated(datasetId, msg.sender, "", block.timestamp, price);
+    }
+
+    function receiveBlocklock(
+        uint256 requestID,
+        bytes calldata decryptionKey
+    ) external override onlyBlocklockContract {
+        // Retrieve the datasetId using the requestId
+        string memory datasetId = requestIdToDatasetId[requestID];
+        if (!datasets[datasetId].isEncrypted)
+            DatasetMarketplace__DatasetNotEncrypted();
+        // get encrypted value
+        TypesLib.Ciphertext memory encryptedValue = datasets[datasetId]
+            .ciphertext;
+        string memory cid = abi.decode(
+            blocklock.decrypt(encryptedValue, decryptionKey),
+            (string)
+        );
+        // Update the dataset with the decrypted CID
+        datasets[datasetId].cid = cid;
+        datasets[datasetId].isEncrypted = false;
+        // loop through the datasetsArray to find the dataset
+        for (uint256 i = 0; i < datasetsArray.length; i++) {
+            if (
+                keccak256(abi.encodePacked(datasetsArray[i].id)) ==
+                keccak256(abi.encodePacked(datasetId))
+            ) {
+                datasetsArray[i].cid = cid;
+                datasetsArray[i].isEncrypted = false;
+                break;
+            }
+        }
+    }
 
     function uploadDataset(
         string calldata datasetId,
@@ -86,7 +182,10 @@ contract DatasetMarketplace is ReentrancyGuard {
             category: category,
             title: title,
             preview: preview,
-            id: datasetId
+            id: datasetId,
+            isEncrypted: false,
+            ciphertext: "",
+            decryptionBlockNumber: 0
         });
         datasetsArray.push(dataset);
         datasets[datasetId] = dataset;
