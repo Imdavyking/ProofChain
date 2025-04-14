@@ -9,3 +9,4 @@ export const DATASET_CONTRACT_ADDRESS = import.meta.env
   .VITE_DATASET_CONTRACT_ADDRESS;
 export const LIT_PROTOCOL_IDENTIFIER = import.meta.env
   .VITE_LIT_PROTOCOL_IDENTIFIER;
+export const ML_URL = import.meta.env.VITE_ML_URL;

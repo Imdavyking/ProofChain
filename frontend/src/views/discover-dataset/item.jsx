@@ -13,7 +13,7 @@ import { FaSpinner } from "react-icons/fa";
 import axios from "../../services/axios.config.services.ts";
 import axiosRequest from "axios";
 import { signDataSetId } from "../../services/dataset.signature.services.ts";
-import { LIT_PROTOCOL_IDENTIFIER } from "../../utils/constants.js";
+import { LIT_PROTOCOL_IDENTIFIER, ML_URL } from "../../utils/constants.js";
 
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
@@ -47,15 +47,12 @@ const DatasetItem = ({ dataset }) => {
         return;
       }
 
-      const trainingResponse = await axiosRequest.post(
-        `http://127.0.0.1:5000/train`,
-        {
-          csv_data: csvData,
-          model_type: modelType,
-          target_column: targetColumn,
-          dataset_id: dataset.id,
-        }
-      );
+      const trainingResponse = await axiosRequest.post(`${ML_URL}/train`, {
+        csv_data: csvData,
+        model_type: modelType,
+        target_column: targetColumn,
+        dataset_id: dataset.id,
+      });
 
       toast.success("Dataset trained successfully!");
 
@@ -73,7 +70,7 @@ const DatasetItem = ({ dataset }) => {
         Object.entries(inputRow).map(([key, value]) => [key.trim(), value])
       );
 
-      const predict = await axiosRequest.post(`http://127.0.0.1:5000/predict`, {
+      const predict = await axiosRequest.post(`${ML_URL}/predict`, {
         dataset_id: dataset.id,
         input_data: trimmedInputRow,
       });
