@@ -1,9 +1,5 @@
 import { ethers, getBytes } from "ethers";
-import {
-  Blocklock,
-  SolidityEncoder,
-  encodeCiphertextToSolidity,
-} from "blocklock-js";
+import { Blocklock, SolidityEncoder } from "blocklock-js";
 import { environment } from "../utils/config";
 export const encryptCid = async (cid: string, extraBlocks: number) => {
   const provider = new ethers.JsonRpcProvider(environment.RPC_URL);

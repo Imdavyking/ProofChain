@@ -207,6 +207,52 @@ export default function UploadNow() {
         )}
 
         <CSVPreview previewRows={preview} />
+        <div className="mt-6">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-gray-700">
+              Encrypt Dataset?
+            </label>
+            <button
+              onClick={() => setIsEncrypted(!isEncrypted)}
+              className={`ml-4 px-4 py-2 rounded-full font-semibold transition-all duration-200 ${
+                isEncrypted
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-300 text-gray-800"
+              }`}
+            >
+              {isEncrypted ? "ON" : "OFF"}
+            </button>
+          </div>
+          {isEncrypted && (
+            <div className="mt-4 flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-700">
+                Extra Blocks
+              </label>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() =>
+                    setExtraBlocks((prev) => Math.max(0, prev - 1))
+                  }
+                  className={`w-8 h-8 rounded-full ${
+                    extraBlocks === 0
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gray-400 hover:bg-gray-500"
+                  } text-lg font-bold text-white`}
+                  disabled={extraBlocks === 0}
+                >
+                  -
+                </button>
+                <span className="text-lg font-semibold">{extraBlocks}</span>
+                <button
+                  onClick={() => setExtraBlocks((prev) => prev + 1)}
+                  className="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-lg font-bold text-white"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <button
           onClick={handleUpload}
           disabled={!file || isUploading}
