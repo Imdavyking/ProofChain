@@ -12,6 +12,7 @@ import { uploadToPinata } from "../services/pinata.services";
 import io from "../utils/create.websocket";
 import { signDataSetCid } from "../services/sign.dataset.services";
 import { encryptCid } from "../services/rand.mu.services";
+import { encodeCiphertextToSolidity } from "blocklock-js";
 dotenv.config();
 
 // Configure multer to accept only .csv files
@@ -156,20 +157,40 @@ export const processCSVUpload = async (req: Request, res: Response) => {
     let cid = pinataResponse.getUrl().split("/").pop();
 
     if (isEncrypted === "true") {
-      const { randMuCiphertext, blockHeight } = await encryptCid(
+      const { randMuCipher, blockHeight } = await encryptCid(
         cid!,
         +extraBlocks!
       );
       cid = "";
       const { signature } = await signDataSetCid(cid!, datasetId);
 
+      let randMuCiphertext = encodeCiphertextToSolidity(randMuCipher);
+
+      const randMuCiphertextTx = {
+        u: {
+          x: [
+            randMuCiphertext.u.x[0].toString(),
+            randMuCiphertext.u.x[1].toString(),
+          ],
+          y: [
+            randMuCiphertext.u.y[0].toString(),
+            randMuCiphertext.u.y[1].toString(),
+          ],
+        },
+        v: randMuCiphertext.v,
+        w: randMuCiphertext.w,
+      };
+
+      console.log({ randMuCiphertextTx });
+
       res.status(200).json({
         cid,
         datasetId,
         signature,
-        randMuCiphertext,
-        blockHeight,
+        randMuCiphertext: randMuCiphertextTx,
+        blockHeight: Number(blockHeight),
       });
+      return;
     }
 
     const { signature } = await signDataSetCid(cid!, datasetId);

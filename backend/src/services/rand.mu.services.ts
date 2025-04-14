@@ -16,7 +16,7 @@ export const encryptCid = async (cid: string, extraBlocks: number) => {
   const encodedMessage = getBytes(msgBytes);
 
   // Encrypt the encoded message
-  const randMuCiphertext = blocklockjs.encrypt(encodedMessage, blockHeight);
+  const randMuCipher = blocklockjs.encrypt(encodedMessage, blockHeight);
 
-  return { randMuCiphertext, blockHeight };
+  return { randMuCipher, blockHeight };
 };

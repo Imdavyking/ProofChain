@@ -16,7 +16,7 @@ export const uploadToPinata = async (file: File) => {
     return new PinataUploadResponse(url, gateway);
   } catch (error) {
     if (error instanceof Error) {
-      logger.info(`Error processing CSV upload: ${error.message}`);
+      logger.info(`Error processing pinata upload: ${error.message}`);
     }
     return null;
   }
