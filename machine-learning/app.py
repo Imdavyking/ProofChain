@@ -133,4 +133,4 @@ def check_model():
         return jsonify({"message": f"No model found for dataset_id: {dataset_id}"}), 404
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True,debug=True)
+    app.run(host='0.0.0.0', port=5000,debug=True)
