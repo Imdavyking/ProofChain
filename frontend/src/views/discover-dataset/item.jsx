@@ -11,7 +11,7 @@ import {
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import axios from "../../services/axios.config.services.ts";
-import axiosRequest from "axios";
+import axiosRequest, { AxiosError } from "axios";
 import { signDataSetId } from "../../services/dataset.signature.services.ts";
 import { LIT_PROTOCOL_IDENTIFIER, ML_URL } from "../../utils/constants.js";
 
@@ -80,6 +80,10 @@ const DatasetItem = ({ dataset }) => {
       console.log(`Prediction response: ${predict.data}`);
     } catch (error) {
       console.error("Error during train and predict:", error);
+      if (error instanceof AxiosError) {
+        toast.error(`Error: ${error.message}`);
+        return;
+      }
       toast.error("Failed to fetch or process dataset for training.");
     } finally {
       setIsTraining(false);
@@ -186,7 +190,8 @@ const DatasetItem = ({ dataset }) => {
 
       {dataset.decryptionBlockNumber !== 0 ? (
         <p className="mt-2 text-gray-700">
-          <strong>Decryption Block Number:</strong> {dataset.decryptionBlockNumber}
+          <strong>Decryption Block Number:</strong>{" "}
+          {dataset.decryptionBlockNumber}
         </p>
       ) : (
         <>
