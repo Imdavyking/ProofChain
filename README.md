@@ -1,93 +1,129 @@
-**Idea: "ProofChain AI" — A Decentralized AI Dataset Marketplace**
+# **ProofChain AI** - Decentralized AI Dataset Marketplace
 
-A decentralized platform built on Filecoin where users can **upload, verify, and monetize datasets** with **cryptographic provenance**. AI developers can **access high-quality, diverse datasets** while ensuring:
+**ProofChain AI** is a decentralized platform that allows users to **upload, verify, and monetize datasets** in a secure, privacy-preserving manner. Built on **Filecoin** for decentralized storage and **IPFS** for fast data retrieval, **ProofChain AI** ensures **cryptographic provenance**, allowing AI developers to access high-quality, validated datasets while guaranteeing transparency and fairness.
 
-1. **Data Provenance:** Every dataset is hashed, timestamped, and traceable via IPFS/Filecoin CID.
-2. **Data Sourcing:** Contributors are verified and rewarded with tokens based on usage and demand.
-3. **Efficient AI:** Only relevant, validated data is stored and indexed for streamlined training.
-4. **Fair Distribution:** Revenue from dataset usage is transparently distributed to data providers using smart contracts.
+## **Key Features**
 
-The platform promotes **privacy-preserving, auditable AI development** with open standards and decentralized infrastructure.
+### 1. **Data Provenance & Integrity**
 
-Absolutely! Here’s a **simple, step-by-step breakdown** of how you can build the “ProofChain AI” platform using Filecoin and decentralized tech:
+- Every dataset is **hashed**, **timestamped**, and **stored on IPFS/Filecoin**, ensuring **tamper-proof** and **traceable** data lineage.
+- A **record on-chain** (via smart contracts) is created with key metadata: dataset name, type, uploader’s wallet address, timestamp, and the CID (Content Identifier) from IPFS/Filecoin.
 
----
+### 2. **Decentralized Data Sourcing**
 
-### 🚀 **1. Set Up Decentralized Storage with Filecoin/IPFS**
+- Contributors **cryptographically sign** their dataset uploads.
+- **Peer reviews** and **rating systems** are available to validate dataset quality.
+- Contributors are **rewarded in tokens** based on dataset demand and usage.
 
-- Use **IPFS** to upload datasets (text, images, audio, etc.).
-- Store larger datasets on **Filecoin**, which offers persistent, decentralized storage.
-- Every upload returns a **CID (Content Identifier)** — a unique fingerprint of the data.
+### 3. **Efficient AI Development**
 
----
+- Datasets are optimized for **efficient access**: AI developers can retrieve only parts of the dataset they need.
+- Built-in preprocessing via Flask allows developers to filter or transform data on-the-fly for model training.
+- Easy integration with popular AI frameworks like TensorFlow, PyTorch, and Scikit-learn.
 
-### 🧾 **2. Record Data Provenance on Blockchain**
+### 4. **Tokenized Monetization & Fair Distribution**
 
-- When someone uploads a dataset, generate a **record on-chain**:
-  - Dataset name, type, creator’s wallet address.
-  - Timestamp and CID from IPFS/Filecoin.
-- This creates a **tamper-proof history** of who uploaded what and when.
+- Dataset monetization is powered by **smart contracts**, with **100% of the revenue currently directed to the contributor**.
+- **Tokenized access**: Datasets are accessible via **tokens** that unlock data for use.
+- **Future Enhancements**: Smart contracts will eventually allow revenue splits for other roles, such as validators and curators.
 
----
+### 5. **Timed and Synchronized Access**
 
-### 🤝 **3. Verify Data Quality and Source**
-
-- Build a **peer review or rating system**:
-  - Other users can vote on or flag datasets.
-  - Add optional verification steps: manual curation or AI checks.
-- Optionally, require contributors to **sign their uploads** cryptographically.
+- Using **Lit Protocol** and **Randommu**, datasets can be made accessible only after a specific timestamp or at the same time for everyone, enabling **fair AI training competitions** and **timed releases** for research purposes.
 
 ---
 
-### 🔄 **4. Enable Dataset Discovery for AI Developers**
+## **Getting Started**
 
-- Create a **searchable frontend** where AI developers can browse datasets:
-  - Categories (e.g., medical, finance, language, etc.)
-  - Filters (e.g., verified, rated, region-specific)
-- Allow **instant access via IPFS gateways** or retrieval from Filecoin.
+### **Prerequisites**
 
----
+- Install **Python 3.x** and **Flask** for backend development.
+- Install **IPFS** and **Filecoin** nodes (or use a hosted service like Infura or Filecoin’s retrieval network).
+- Set up **Lit Protocol** for access control (using token-gated permissions).
 
-### 💰 **5. Tokenize Access and Fairly Distribute Rewards**
+### **Install Dependencies**
 
-- Charge a **small fee or token** for each dataset download or API access.
-- Use **smart contracts** to:
-  - Split revenue between dataset contributors.
-  - Optionally reward validators and curators too.
-- Example: 70% to uploader, 20% to validators, 10% platform treasury.
+```bash
+pip install flask web3
+```
 
----
+For **frontend**:
 
-### ⚡️ **6. Optimize for Efficient AI Usage**
-
-- Provide options to download **only parts of datasets** (e.g., a few samples).
-- Support **on-the-fly preprocessing** or filters (e.g., only English text).
-- Allow developers to **fetch and train AI models directly** from decentralized storage.
+```bash
+npm install react @web3uikit/core ipfs-http-client
+```
 
 ---
 
-### 🌐 **7. Make It Interoperable and Private**
+## **How It Works**
 
-- Use **standards like JSON-LD or RDF** for dataset metadata.
-- Support **encryption for private datasets** where access is token-gated.
-- Make the system composable: other apps and AI tools can plug in.
+### **1. Upload a Dataset**
 
-tackle
-1. Data provenance
-2. Data sourcing
-3. Efficient AI
-4. Fair distrubtion.
+- Contributors upload their datasets to **IPFS** and store them on **Filecoin**.
+- A **CID** is generated for each dataset and is used as a unique fingerprint.
+- A record is created on-chain with metadata: dataset name, uploader wallet, and CID.
 
-Build the future of AI on with decentralized storage on filecoin,enhancing data provenance,privacy,efficiency,and interoperability.
+### **2. Dataset Discovery**
 
+- AI developers can search for datasets through the **dataset explorer**.
+- They can apply filters based on categories (e.g., medical, finance, etc.), ratings, and metadata.
+- Datasets are accessible via **IPFS gateways** or direct retrieval from Filecoin.
 
+### **3. Monetize the Dataset**
 
-Akave
-app that upload dataset, and train models against them with self custody wallet
+- Datasets are **tokenized** and can be accessed by paying with the **ProofChain token**.
+- **Smart contracts** manage payments, with 100% of the revenue going directly to the dataset contributor.
 
-https://docs.akave.ai/js-docker-example-code
+### **4. Peer Review and Validation**
 
+- **Community-driven validation**: Datasets can be reviewed, rated, and flagged by the community.
+- Verified datasets increase visibility and attract more demand.
 
-Ensure datasets become accessible only after a specific timestamp, or simultaneously for everyone, e.g., in AI training competitions.
+---
 
-Use VRF to introduce fair random rewards for data contributors, top-rated datasets, or randomly select reviewers for bonuses.
+## **Future Roadmap**
+
+### ✅ **Phase 1 – MVP (Q2 2025)**
+
+- Dataset upload via **IPFS/Filecoin**.
+- Metadata registry on-chain (CID, timestamp, contributor info).
+- Flask backend for **model training** and **prediction APIs**.
+- **Tokenized access** via **Lit Protocol**.
+- **Smart contracts** for dataset monetization, with all revenue going to the contributor.
+
+### 🚧 **Phase 2 – Marketplace Launch (Q3 2025)**
+
+- Dataset explorer with **search**, **filters**, and **peer reviews**.
+- Token economy (ProofChain Token) and **future revenue splits** for validators/curators.
+- Dataset rating and flagging system.
+
+### 🔜 **Phase 3 – AI Developer Tools & Ecosystem Growth (Q4 2025)**
+
+- **Python SDK** for seamless AI integration.
+- **Timed dataset access** with **Randommu** and **Lit Protocol**.
+- Tools for **AI competitions** and **fair access** to datasets.
+- Usage analytics and **contributor dashboards** for performance tracking.
+
+### 🚀 **Phase 4 – Scale & Interoperability (2026)**
+
+- Multi-chain support (FVM, L2s, cross-chain dataset provenance).
+- Privacy-preserving data sharing using **zkProofs/FHE**.
+- **DAO governance** for platform upgrades, grants, and ecosystem development.
+- Integration with **research labs**, **academic institutions**, and **AI companies**.
+
+---
+
+## **Contribute**
+
+ProofChain AI is an open-source project! We welcome contributions to help enhance the platform and build a sustainable AI ecosystem.
+
+- Fork the repository, open an issue, or submit a pull request.
+- Join our **Discord** community for discussions and collaboration.
+
+---
+
+## **License**
+
+This project is licensed under the **MIT License** - see [LICENSE](LICENSE) for more information.
+
+---

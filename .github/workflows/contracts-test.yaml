@@ -24,6 +24,7 @@ jobs:
       API_URL: ${{vars.API_URL}}
       BROWSER_URL: ${{vars.BROWSER_URL}}
       API_SCAN_VERIFIER_KEY: ${{vars.API_SCAN_VERIFIER_KEY}}
+      BLOCKLOCK_SENDER_PROXY: ${{vars.BLOCKLOCK_SENDER_PROXY}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
