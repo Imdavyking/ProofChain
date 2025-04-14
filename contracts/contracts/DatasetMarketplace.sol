@@ -28,9 +28,9 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
         string title;
         string preview;
         string id;
+        uint256 decryptionBlockNumber;
         bool isEncrypted;
         TypesLib.Ciphertext ciphertext;
-        uint256 decryptionBlockNumber;
     }
 
     // datasetsArray

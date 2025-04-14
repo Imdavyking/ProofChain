@@ -184,118 +184,124 @@ const DatasetItem = ({ dataset }) => {
 
       <CSVPreview previewRows={JSON.parse(dataset.preview)} />
 
-      {csvData && targetColumn && (
-        <div className="mt-4">
-          <h4 className="font-semibold text-gray-700 mb-2">
-            Enter Custom Input Row (excluding target column)
-          </h4>
+      {decryptionBlockNumber !== 0 ? (
+        <p className="mt-2 text-gray-700">
+          <strong>Decryption Block Number:</strong> {decryptionBlockNumber}
+        </p>
+      ) : (
+        <>
+          {" "}
+          {csvData && targetColumn && (
+            <div className="mt-4">
+              <h4 className="font-semibold text-gray-700 mb-2">
+                Enter Custom Input Row (excluding target column)
+              </h4>
 
-          {columns
-            .filter((col) => col !== targetColumn)
-            .map((col, index) => (
-              <div key={index} className="mb-2">
-                <label className="block text-gray-600">{col}</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded-lg"
-                  value={inputRow[col] || ""}
-                  onChange={(e) =>
-                    setInputRow((prev) => ({
-                      ...prev,
-                      [col]: e.target.value,
-                    }))
-                  }
+              {columns
+                .filter((col) => col !== targetColumn)
+                .map((col, index) => (
+                  <div key={index} className="mb-2">
+                    <label className="block text-gray-600">{col}</label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded-lg"
+                      value={inputRow[col] || ""}
+                      onChange={(e) =>
+                        setInputRow((prev) => ({
+                          ...prev,
+                          [col]: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+            </div>
+          )}
+          {csvData && (
+            <div className="mt-4">
+              <h4 className="font-semibold text-gray-700">Train and Predict</h4>
+              <div className="mt-2">
+                <label className="block text-gray-600">Target Column</label>
+                <select
+                  className="w-full p-2 border rounded-lg mt-2"
+                  value={targetColumn}
+                  onChange={(e) => setTargetColumn(e.target.value)}
+                >
+                  <option value="">Select a target column</option>
+
+                  {columns.map((col, index) => (
+                    <option key={index} value={col}>
+                      {col}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-2">
+                <label className="block text-gray-600">Model Type</label>
+                <select
+                  className="w-full p-2 border rounded-lg mt-2"
+                  value={modelType}
+                  onChange={(e) => setModelType(e.target.value)}
+                >
+                  {modelTypes.map((type, index) => (
+                    <option key={index} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-2">
+                <label className="block text-gray-600">Prediction Result</label>
+                <textarea
+                  className="w-full p-2 border rounded-lg mt-2"
+                  value={prediction ? JSON.stringify(prediction, null, 2) : ""}
+                  readOnly
+                  rows={4}
                 />
               </div>
-            ))}
-        </div>
-      )}
 
-      {csvData && (
-        <div className="mt-4">
-          <h4 className="font-semibold text-gray-700">Train and Predict</h4>
-          <div className="mt-2">
-            <label className="block text-gray-600">Target Column</label>
-            <select
-              className="w-full p-2 border rounded-lg mt-2"
-              value={targetColumn}
-              onChange={(e) => setTargetColumn(e.target.value)}
-            >
-              <option value="">Select a target column</option>
-
-              {columns.map((col, index) => (
-                <option key={index} value={col}>
-                  {col}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mt-2">
-            <label className="block text-gray-600">Model Type</label>
-            <select
-              className="w-full p-2 border rounded-lg mt-2"
-              value={modelType}
-              onChange={(e) => setModelType(e.target.value)}
-            >
-              {modelTypes.map((type, index) => (
-                <option key={index} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mt-2">
-            <label className="block text-gray-600">Prediction Result</label>
-            <textarea
-              className="w-full p-2 border rounded-lg mt-2"
-              value={prediction ? JSON.stringify(prediction, null, 2) : ""}
-              readOnly
-              rows={4}
-            />
-          </div>
-
+              <button
+                onClick={() => trainAndPredict({ targetColumn, modelType })}
+                className="mt-4 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                disabled={!targetColumn || isTraining}
+              >
+                {isTraining ? (
+                  <div className="flex items-center justify-center">
+                    <FaSpinner className="animate-spin text-2xl" />
+                  </div>
+                ) : (
+                  "Train and Predict"
+                )}
+              </button>
+            </div>
+          )}
           <button
-            onClick={() => trainAndPredict({ targetColumn, modelType })}
-            className="mt-4 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-            disabled={!targetColumn || isTraining}
+            className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            onClick={canAccessDataset ? useDataSet : purchaseAccessOnChain}
+            disabled={isLoading}
           >
-            {isTraining ? (
+            {isLoading ? (
               <div className="flex items-center justify-center">
                 <FaSpinner className="animate-spin text-2xl" />
               </div>
+            ) : canAccessDataset ? (
+              "Use Dataset"
             ) : (
-              "Train and Predict"
+              `Access Dataset ${dataset.priceIntFIL} tFIL`
             )}
           </button>
-        </div>
-      )}
-
-      <button
-        className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        onClick={canAccessDataset ? useDataSet : purchaseAccessOnChain}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <div className="flex items-center justify-center">
-            <FaSpinner className="animate-spin text-2xl" />
-          </div>
-        ) : canAccessDataset ? (
-          "Use Dataset"
-        ) : (
-          `Access Dataset ${dataset.priceIntFIL} tFIL`
-        )}
-      </button>
-
-      {csvData && (
-        <button
-          className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          onClick={downloadCSV}
-          disabled={isLoading}
-        >
-          Download CSV
-        </button>
+          {csvData && (
+            <button
+              className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              onClick={downloadCSV}
+              disabled={isLoading}
+            >
+              Download CSV
+            </button>
+          )}
+        </>
       )}
     </div>
   );

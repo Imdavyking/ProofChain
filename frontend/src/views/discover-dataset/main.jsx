@@ -38,6 +38,7 @@ function DiscoverDataset() {
         preview: dataset[9],
         id: dataset[10],
         verified: true,
+        decryptionBlockNumber: Number(dataset[11]),
       }));
 
       setDatasets(transformedDatasets);
