@@ -1,6 +1,7 @@
 {
   "name": "hardhat-project",
   "scripts": {
+    "postinstall": "sed -i '' 's/dist\\/cjs\\/index.js/dist\\/cjs\\/index.cjs/' node_modules/blocklock-js/package.json",
     "dev": "nodemon src/app.ts",
     "start": "node build/app.js",
     "build": "yarn && tsc",
