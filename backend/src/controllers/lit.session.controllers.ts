@@ -4,6 +4,9 @@ import logger from "../config/logger";
 import { ethers } from "ethers";
 import { environment } from "../utils/config";
 import { mintCapacityNFT } from "../services/mint.lit.services";
+import { encryptString, decryptToString } from "@lit-protocol/encryption";
+import { LIT_NETWORK } from "@lit-protocol/constants";
+import * as LitJsSdk from "@lit-protocol/lit-node-client";
 dotenv.config();
 
 export const getSessionSigs = async (req: Request, res: Response) => {
@@ -11,7 +14,14 @@ export const getSessionSigs = async (req: Request, res: Response) => {
     const dataSetABI = new ethers.Interface([
       "function canAccess(string calldata datasetId, address user) external view returns (bool)",
     ]);
-    const { signature, message: datasetId } = req.body;
+    const {
+      signature,
+      message: datasetId,
+      evmContractConditions,
+      chain,
+      ciphertext,
+      dataToEncryptHash,
+    } = req.body;
     const messageHash = ethers.solidityPackedKeccak256(
       ["uint256"],
       [datasetId]
@@ -39,9 +49,25 @@ export const getSessionSigs = async (req: Request, res: Response) => {
     }
     if (canAccess) {
       const sessionSigs = await mintCapacityNFT();
+      const litNodeClient = new LitJsSdk.LitNodeClient({
+        litNetwork: LIT_NETWORK.DatilTest,
+        debug: false,
+      });
+      await litNodeClient.connect();
+      const decryptedString = await decryptToString(
+        {
+          ciphertext,
+          sessionSigs,
+          evmContractConditions,
+          chain,
+          dataToEncryptHash,
+        },
+        litNodeClient
+      );
       res.status(200).json({
         message: "User has access to this dataset",
         sessionSigs,
+        decryptedString,
       });
     }
   } catch (error) {

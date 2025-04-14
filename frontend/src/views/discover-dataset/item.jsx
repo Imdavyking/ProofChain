@@ -44,19 +44,12 @@ const DatasetItem = ({ dataset }) => {
       const sessionResponse = await axios.post("/api/lit-session", {
         signature,
         message,
+        evmContractConditions,
+        chain: LIT_PROTOCOL_IDENTIFIER,
+        ciphertext,
+        dataToEncryptHash,
       });
-      const { sessionSigs } = sessionResponse.data;
-
-      const decryptedString = await litNodeClient.decrypt(
-        {
-          evmContractConditions,
-          chain: LIT_PROTOCOL_IDENTIFIER,
-          ciphertext,
-          dataToEncryptHash,
-          sessionSigs,
-        },
-        litNodeClient
-      );
+      const { sessionSigs, decryptedString } = sessionResponse.data;
 
       console.log(decryptedString);
       rethrowFailedResponse(response);

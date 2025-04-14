@@ -84,3 +84,5 @@ Build the future of AI on with decentralized storage on filecoin,enhancing data 
 
 Akave
 app that upload dataset, and train models against them with self custody wallet
+
+https://docs.akave.ai/js-docker-example-code

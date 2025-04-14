@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { LIT_NETWORK } from "@lit-protocol/constants";
+import { encryptString,decryptToString } from "@lit-protocol/encryption";
 import multer from "multer";
 import path from "path";
 import logger from "../config/logger";
@@ -102,10 +103,13 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       message: "Generating access control conditions...",
       status: "info",
     });
-    const { ciphertext, dataToEncryptHash } = await litNodeClient.encrypt({
-      evmContractConditions,
-      dataToEncrypt: new Uint8Array(file.buffer),
-    });
+    const { ciphertext, dataToEncryptHash } = await encryptString(
+      {
+        evmContractConditions,
+        dataToEncrypt: file.buffer.toString("utf-8"),
+      },
+      litNodeClient
+    );
 
     io.emit(socketId, {
       message: "Data encrypted successfully",
