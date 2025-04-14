@@ -184,9 +184,9 @@ const DatasetItem = ({ dataset }) => {
 
       <CSVPreview previewRows={JSON.parse(dataset.preview)} />
 
-      {decryptionBlockNumber !== 0 ? (
+      {dataset.decryptionBlockNumber !== 0 ? (
         <p className="mt-2 text-gray-700">
-          <strong>Decryption Block Number:</strong> {decryptionBlockNumber}
+          <strong>Decryption Block Number:</strong> {dataset.decryptionBlockNumber}
         </p>
       ) : (
         <>
