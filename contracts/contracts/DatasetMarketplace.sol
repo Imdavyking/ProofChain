@@ -84,13 +84,13 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
 
     function uploadEncryptedDataset(
         string calldata datasetId,
-        TypesLib.Ciphertext calldata ciphertext,
         uint256 price,
         DatasetCategory category,
         string calldata preview,
         string calldata title,
+        bytes memory signature,
         uint256 decryptionBlockNumber,
-        bytes memory signature
+        TypesLib.Ciphertext calldata ciphertext
     ) external {
         Dataset memory dataset = Dataset({
             owner: msg.sender,

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { LIT_NETWORK } from "@lit-protocol/constants";
-import { encryptString,decryptToString } from "@lit-protocol/encryption";
+import { encryptString, decryptToString } from "@lit-protocol/encryption";
 import multer from "multer";
 import path from "path";
 import logger from "../config/logger";
@@ -11,6 +11,7 @@ import { environment } from "../utils/config";
 import { uploadToPinata } from "../services/pinata.services";
 import io from "../utils/create.websocket";
 import { signDataSetCid } from "../services/sign.dataset.services";
+import { encryptCid } from "../services/rand.mu.services";
 dotenv.config();
 
 // Configure multer to accept only .csv files
@@ -42,6 +43,8 @@ export const processCSVUpload = async (req: Request, res: Response) => {
   try {
     const file = req.file;
     const socketId = req.query.socketId as string;
+    const isEncrypted = req.query.isEncrypted as string;
+    const extraBlocks = req.query.extraBlocks as string;
 
     logger.info(`Processing CSV upload for socket ID: ${socketId}`);
 
@@ -150,15 +153,26 @@ export const processCSVUpload = async (req: Request, res: Response) => {
       return;
     }
 
-    const cid = pinataResponse.getUrl().split("/").pop();
+    let cid = pinataResponse.getUrl().split("/").pop();
+
+    if (isEncrypted === "true") {
+      const { randMuCiphertext, blockHeight } = await encryptCid(
+        cid!,
+        +extraBlocks!
+      );
+      cid = "";
+      const { signature } = await signDataSetCid(cid!, datasetId);
+
+      res.status(200).json({
+        cid,
+        datasetId,
+        signature,
+        randMuCiphertext,
+        blockHeight,
+      });
+    }
 
     const { signature } = await signDataSetCid(cid!, datasetId);
-
-    console.log({
-      cid,
-      datasetId,
-      signature,
-    });
 
     res.status(200).json({
       cid,

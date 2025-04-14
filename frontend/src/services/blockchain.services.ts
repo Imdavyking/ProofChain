@@ -126,6 +126,8 @@ export const saveDatasetCid = async ({
   preview,
   title,
   signature,
+  randMuCiphertext,
+  blockHeight,
 }: {
   datasetId: string;
   cid: string;
@@ -134,6 +136,8 @@ export const saveDatasetCid = async ({
   preview: string;
   title: string;
   signature: string;
+  randMuCiphertext: string;
+  blockHeight: number;
 }) => {
   try {
     const datasetContract = await getDatasetContract();
@@ -141,6 +145,21 @@ export const saveDatasetCid = async ({
     if (!datasetContract) {
       console.error("Failed to get dataset contract");
       return;
+    }
+
+    if (randMuCiphertext) {
+      const transaction = await datasetContract.uploadEncryptedDataset(
+        datasetId,
+        ethers.parseEther(price.toString()),
+        category,
+        preview,
+        title,
+        signature,
+        blockHeight,
+        randMuCiphertext
+      );
+      const receipt = await transaction.wait(1);
+      return `Uploaded Encrypted dataset with tx hash: ${receipt.transactionHash}`;
     }
 
     const transaction = await datasetContract.uploadDataset(

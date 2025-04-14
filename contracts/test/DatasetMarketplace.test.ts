@@ -5,6 +5,9 @@ import { DatasetMarketplace } from "../typechain-types";
 import { ContractTransactionResponse } from "ethers";
 import { initKeystore } from "../utils/init.keystore";
 import { wallet } from "../hardhat.config";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 describe("DatasetMarketplace", function () {
   let marketplace: DatasetMarketplace & {
@@ -19,7 +22,7 @@ describe("DatasetMarketplace", function () {
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
     const Marketplace = await ethers.getContractFactory("DatasetMarketplace");
-    marketplace = await Marketplace.deploy();
+    marketplace = await Marketplace.deploy(process.env.BLOCKLOCK_SENDER_PROXY!);
     await marketplace.waitForDeployment();
 
     const ethSignedMessageproofHash = ethers.solidityPackedKeccak256(

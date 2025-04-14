@@ -21,6 +21,7 @@ services:
       - LIT_PROTOCOL_IDENTIFIER
       - PRIVATE_KEY
       - RPC_URL
+      - BLOCKLOCK_SENDER_PROXY
     environment:
       - FRONTEND_URL=http://localhost:3000
     healthcheck:
@@ -96,6 +97,8 @@ secrets:
     file: ./backend/secrets/PRIVATE_KEY
   RPC_URL:
     file: ./backend/secrets/RPC_URL
+  BLOCKLOCK_SENDER_PROXY:
+    file: ./backend/secrets/BLOCKLOCK_SENDER_PROXY
 
 volumes:
   mongodb-data:

@@ -16,6 +16,8 @@ export default function UploadNow() {
   const [success, setSuccess] = useState("");
   const [category, setCategory] = useState("0");
   const [isUploading, setisUploading] = useState(false);
+  const [isEncrypted, setIsEncrypted] = useState(false);
+  const [extraBlocks, setExtraBlocks] = useState(0);
   const [preview, setPreviewRows] = useState([]);
   const [price, setPrice] = useState(0);
   const handleFileChange = (e) => {
@@ -68,8 +70,14 @@ export default function UploadNow() {
         toast.dismiss();
         toast[status]?.(message);
       });
+      const queryParams = new URLSearchParams({
+        socketId,
+        isEncrypted,
+        extraBlocks,
+      });
+
       const response = await axios.post(
-        `/api/upload-csv?socketId=${socketId}`,
+        `/api/upload-csv?socketId=${queryParams.toString()}`,
         formData,
         {
           headers: {
@@ -103,7 +111,8 @@ export default function UploadNow() {
       setError("");
 
       setPreviewRows(preview); // set this state and display below the file input
-      const { cid, datasetId, signature } = response.data;
+      const { cid, datasetId, signature, randMuCiphertext, blockHeight } =
+        response.data;
       const saveDatasetCidResult = await saveDatasetCid({
         cid,
         datasetId,
@@ -113,6 +122,8 @@ export default function UploadNow() {
         preview:
           typeof preview === "string" ? preview : JSON.stringify(preview),
         title: file.name,
+        randMuCiphertext,
+        blockHeight,
       });
       rethrowFailedResponse(saveDatasetCidResult);
     } catch (err) {

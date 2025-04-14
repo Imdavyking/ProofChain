@@ -30,6 +30,7 @@ export const secret: {
       "LIT_PROTOCOL_IDENTIFIER",
       "PRIVATE_KEY",
       "RPC_URL",
+      "BLOCKLOCK_SENDER_PROXY",
     ];
 
     const loadedSecrets: Record<string, string> = {};
