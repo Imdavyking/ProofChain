@@ -129,7 +129,90 @@ While integrating **Randommu** for timed dataset access, we encountered an issue
 Manually update the `main` field in `node_modules/blocklock-js/package.json`:
 
 ```json
-"main": "index.cjs"
+{
+  "name": "blocklock-js",
+  "version": "0.0.8-rc1",
+  "description": "A library for encrypting and decrypting data for the future",
+  "source": "src/index.ts",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.cjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/cjs/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/esm/index.cjs"
+      }
+    }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "npm run clean && npm run build:solidity && npm run build:generate && npm run build:esm && npm run build:cjs && npm run build:types",
+    "build:solidity": "(cd ./blocklock-solidity && forge build && cd ..)",
+    "build:generate": "mkdir -p src/generated && npx typechain --target ethers-v6 --out-dir src/generated './blocklock-solidity/out/*.sol/*.json'",
+    "build:esm": "esbuild src/index.ts --bundle --platform=browser --format=esm --outdir=dist/esm --sourcemap --target=es2020 --out-extension:.js=.mjs",
+    "build:cjs": "esbuild src/index.ts --bundle --platform=node --format=cjs --outdir=dist/cjs --sourcemap --target=es2020 --out-extension:.js=.cjs",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix",
+    "test": "jest ./test/*.test.ts"
+  },
+  "keywords": [
+    "conditional",
+    "timelock",
+    "encryption",
+    "dcipher",
+    "randamu",
+    "threshold",
+    "evm",
+    "ethereum"
+  ],
+  "author": "randa.mu",
+  "license": "Apache-2.0/MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/randa-mu/blocklock-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/randa-mu/blocklock-js/issues"
+  },
+  "homepage": "https://github.com/randa-mu/blocklock-js#readme",
+  "dependencies": {
+    "@noble/curves": "^1.6.0",
+    "@noble/hashes": "^1.5.0",
+    "asn1js": "^3.0.5",
+    "buffer": "^6.0.3",
+    "ethers": "^6.13.4",
+    "mcl-wasm": "^1.7.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.7.5",
+    "dotenv": "^16.4.5",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.17.0",
+    "ganache": "^7.9.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.11.0"
+  },
+  "engines": {
+    "node": ">= 22.0.0"
+  }
+}
 ```
 
 This allows the package to load correctly during runtime.
