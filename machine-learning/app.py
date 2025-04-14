@@ -109,13 +109,17 @@ def predict():
     if dataset_id not in trained_models:
         return jsonify({"error": "Model is not trained yet for this dataset"}), 400
     
-    # Make prediction using the trained model
-    prediction = make_predictions(input_data, dataset_id)
-    
-    if prediction is None:
-        return jsonify({"error": "Prediction failed"}), 400
-    
-    return jsonify({"prediction": prediction})
+    try:
+        # Make prediction using the trained model
+        prediction = make_predictions(input_data, dataset_id)
+        
+        if prediction is None:
+            return jsonify({"error": "Prediction failed"}), 400
+        
+        return jsonify({"prediction": prediction})
+    except Exception as e:
+        return jsonify({"error": f"Prediction failed: {str(e)}"}), 400
+
 
 # Endpoint to check if a model is trained for a specific dataset_id
 @app.route('/check_model', methods=['GET'])
