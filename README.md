@@ -113,6 +113,27 @@ npm install react @web3uikit/core ipfs-http-client
 
 ---
 
+Sure! Here's the section you can add under a new heading like **"Known Issues / Troubleshooting"**:
+
+---
+
+## **Known Issues / Troubleshooting**
+
+### 🛠️ `randmu` Integration Issue
+
+While integrating **Randommu** for timed dataset access, we encountered an issue with the `blocklock-js` package:
+
+> ❗ The `package.json` in `blocklock-js` points to `index.js`, but that file does not exist. Only `index.cjs` is available.
+
+**Fix**:  
+Manually update the `main` field in `node_modules/blocklock-js/package.json`:
+
+```json
+"main": "index.cjs"
+```
+
+This allows the package to load correctly during runtime.
+
 ## **Contribute**
 
 ProofChain AI is an open-source project! We welcome contributions to help enhance the platform and build a sustainable AI ecosystem.
