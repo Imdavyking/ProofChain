@@ -12,13 +12,11 @@ import io
 # Initialize the Flask app
 app = Flask(__name__)
 
-# Global variable to hold the trained model
-trained_model = None
+# Dictionary to hold the trained models for each dataset_id
+trained_models = {}
 
 # Function to train the model
-def train_model(csv_data, model_type, target_column):
-    global trained_model
-
+def train_model(csv_data, model_type, target_column, dataset_id):
     # Read CSV data into a DataFrame
     df = pd.read_csv(io.StringIO(csv_data))
     
@@ -52,14 +50,15 @@ def train_model(csv_data, model_type, target_column):
     # Train the model
     pipeline.fit(X, y)
     
-    # Store the trained model
-    trained_model = pipeline
+    # Store the trained model using the dataset_id
+    trained_models[dataset_id] = pipeline
 
 # Function to make predictions
-def make_predictions(input_data):
-    global trained_model
-    if trained_model is None:
+def make_predictions(input_data, dataset_id):
+    if dataset_id not in trained_models:
         return None
+    
+    trained_model = trained_models[dataset_id]
     
     # Convert input data into DataFrame
     input_df = pd.DataFrame([input_data])
@@ -74,17 +73,18 @@ def make_predictions(input_data):
 def train():
     data = request.get_json()
     
-    # Get the CSV data, model type, and target column from the request
+    # Get the CSV data, model type, target column, and dataset_id from the request
     csv_data = data.get('csv_data')
     model_type = data.get('model_type')
     target_column = data.get('target_column')
+    dataset_id = data.get('dataset_id')
     
-    if not csv_data or not model_type or not target_column:
+    if not csv_data or not model_type or not target_column or not dataset_id:
         return jsonify({"error": "Missing required parameters"}), 400
     
     try:
         # Train the model with the provided data and model type
-        train_model(csv_data, model_type, target_column)
+        train_model(csv_data, model_type, target_column, dataset_id)
         return jsonify({"message": "Model trained successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
@@ -94,23 +94,39 @@ def train():
 def predict():
     data = request.get_json()
     
-    # Ensure model has been trained
-    if trained_model is None:
-        return jsonify({"error": "Model is not trained yet"}), 400
-    
-    # Get the input data for prediction
+    # Get the dataset_id and input data for prediction
+    dataset_id = data.get('dataset_id')
     input_data = data.get('input_data')
     
-    if not input_data:
-        return jsonify({"error": "Missing input data for prediction"}), 400
+    if not dataset_id or not input_data:
+        return jsonify({"error": "Missing required parameters"}), 400
+    
+    # Ensure model has been trained for the dataset_id
+    if dataset_id not in trained_models:
+        return jsonify({"error": "Model is not trained yet for this dataset"}), 400
     
     # Make prediction using the trained model
-    prediction = make_predictions(input_data)
+    prediction = make_predictions(input_data, dataset_id)
     
     if prediction is None:
         return jsonify({"error": "Prediction failed"}), 400
     
     return jsonify({"prediction": prediction})
+
+# Endpoint to check if a model is trained for a specific dataset_id
+@app.route('/check_model', methods=['GET'])
+def check_model():
+    # Get the dataset_id from the request
+    dataset_id = request.args.get('dataset_id')
+    
+    if not dataset_id:
+        return jsonify({"error": "Missing dataset_id parameter"}), 400
+    
+    # Check if the model exists for the given dataset_id
+    if dataset_id in trained_models:
+        return jsonify({"message": f"Model is trained for dataset_id: {dataset_id}"}), 200
+    else:
+        return jsonify({"message": f"No model found for dataset_id: {dataset_id}"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -25,9 +25,59 @@ const DatasetItem = ({ dataset }) => {
     setCanAccessDataset(userCanDownload);
   };
 
+  const modelTypes = ["LinearRegression", "RandomForest", "DecisionTree"];
+
+  const trainAndPredict = async ({ targetColumn, modelType }) => {
+    try {
+      const pinataUrl = `https://emerald-odd-bee-965.mypinata.cloud/ipfs/${dataset.cid}`;
+      const fetchResult = await axiosRequest.get(pinataUrl);
+      const { ciphertext, dataToEncryptHash, evmContractConditions } =
+        fetchResult.data;
+
+      const litNodeClient = new LitJsSdk.LitNodeClient({
+        litNetwork: LIT_NETWORK.DatilTest,
+        debug: false,
+      });
+      await litNodeClient.connect();
+      const message = dataset.id;
+      const signature = await signDataSetId(message);
+      const sessionResponse = await axios.post("/api/lit-session", {
+        signature,
+        message,
+        evmContractConditions,
+        chain: LIT_PROTOCOL_IDENTIFIER,
+        ciphertext,
+        dataToEncryptHash,
+      });
+      const { decryptedString: csv_data } = sessionResponse.data;
+      const responseTraining = await axiosRequest.post(
+        "http://127.0.0.1:5000/train",
+        {
+          dataset_id: dataset.id,
+          model_type: modelType,
+          target_column: targetColumn,
+          csv_data,
+        }
+      );
+    } catch (error) {}
+  };
+  // add train and predict button and also UI
+  //  // csv_data = data.get('csv_data')
+  //     // model_type = data.get('model_type')
+  //     // target_column = data.get('target_column')
+  //     // dataset_id = data.get('dataset_id')
+
+  //
+  // dataset_id = data.get('dataset_id')
+  // input_data = data.get('input_data')
+  //     axiosRequest.post("http://127.0.0.1:5000/predict",{
+  //       datasetId: dataset.id,
+  //     });
+
   const downloadDataset = async () => {
     try {
       setIsLoading(true);
+
       const response = "";
       const pinataUrl = `https://emerald-odd-bee-965.mypinata.cloud/ipfs/${dataset.cid}`;
       const fetchResult = await axiosRequest.get(pinataUrl);
