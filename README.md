@@ -86,3 +86,8 @@ Akave
 app that upload dataset, and train models against them with self custody wallet
 
 https://docs.akave.ai/js-docker-example-code
+
+
+Ensure datasets become accessible only after a specific timestamp, or simultaneously for everyone, e.g., in AI training competitions.
+
+Use VRF to introduce fair random rewards for data contributors, top-rated datasets, or randomly select reviewers for bonuses.

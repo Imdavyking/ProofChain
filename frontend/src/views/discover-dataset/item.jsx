@@ -52,6 +52,16 @@ const DatasetItem = ({ dataset }) => {
       const { sessionSigs, decryptedString } = sessionResponse.data;
 
       console.log(decryptedString);
+      const blob = new Blob([decryptedString], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = dataset.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       rethrowFailedResponse(response);
       toast.success("Download started!");
       setCanAccessDataset(true);
