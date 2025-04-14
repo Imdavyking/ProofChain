@@ -5,6 +5,7 @@ import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/Messa
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 // Import the Types library for managing ciphertexts
 import {TypesLib} from "blocklock-solidity/src/libraries/TypesLib.sol";
+import {BLS} from "blocklock-solidity/src/libraries/BLS.sol";
 // Import the AbstractBlocklockReceiver for handling timelock decryption callbacks
 import {AbstractBlocklockReceiver} from "blocklock-solidity/src/AbstractBlocklockReceiver.sol";
 
@@ -135,10 +136,10 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
         uint256 requestID,
         bytes calldata decryptionKey
     ) external override onlyBlocklockContract {
-        // Retrieve the datasetId using the requestId
         string memory datasetId = requestIdToDatasetId[requestID];
-        if (!datasets[datasetId].isEncrypted)
-            DatasetMarketplace__DatasetNotEncrypted();
+        if (!datasets[datasetId].isEncrypted) {
+            revert DatasetMarketplace__DatasetNotEncrypted();
+        }
         // get encrypted value
         TypesLib.Ciphertext memory encryptedValue = datasets[datasetId]
             .ciphertext;
@@ -184,7 +185,14 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
             preview: preview,
             id: datasetId,
             isEncrypted: false,
-            ciphertext: "",
+            ciphertext: TypesLib.Ciphertext({
+                u: BLS.PointG2({
+                    x: [uint256(0), uint256(0)],
+                    y: [uint256(0), uint256(0)]
+                }),
+                v: "",
+                w: ""
+            }),
             decryptionBlockNumber: 0
         });
         datasetsArray.push(dataset);
