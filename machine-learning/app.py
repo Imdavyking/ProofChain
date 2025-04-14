@@ -7,10 +7,14 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
+from flask_cors import CORS
+
+
 import io
 
 # Initialize the Flask app
 app = Flask(__name__)
+CORS(app)
 
 # Dictionary to hold the trained models for each dataset_id
 trained_models = {}
