@@ -14,6 +14,7 @@ import axios from "../../services/axios.config.services.ts";
 import axiosRequest, { AxiosError } from "axios";
 import { signDataSetId } from "../../services/dataset.signature.services.ts";
 import { LIT_PROTOCOL_IDENTIFIER, ML_URL } from "../../utils/constants.js";
+import { mintCapacityNFT } from "../../services/mint.session.services.ts";
 
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
@@ -123,6 +124,7 @@ const DatasetItem = ({ dataset }) => {
       await litNodeClient.connect();
       const message = dataset.id;
       const signature = await signDataSetId(message);
+      // await mintCapacityNFT();
       const sessionResponse = await axios.post("/api/lit-session", {
         signature,
         message,
@@ -131,16 +133,16 @@ const DatasetItem = ({ dataset }) => {
         ciphertext,
         dataToEncryptHash,
       });
-      const { sessionSigs, decryptedString } = sessionResponse.data;
-      setCsvData(decryptedString);
-      const rows = decryptedString.split("\n");
-      console.log(`Rows: ${rows[0]}`);
-      const columns = rows[0].split(",");
-      console.log(`Columns: ${columns}`);
-      setColumns(columns);
-      rethrowFailedResponse(response);
-      toast.success("Download started!");
-      setCanAccessDataset(true);
+      // const { sessionSigs, decryptedString } = sessionResponse.data;
+      // setCsvData(decryptedString);
+      // const rows = decryptedString.split("\n");
+      // console.log(`Rows: ${rows[0]}`);
+      // const columns = rows[0].split(",");
+      // console.log(`Columns: ${columns}`);
+      // setColumns(columns);
+      // rethrowFailedResponse(response);
+      // toast.success("Download started!");
+      // setCanAccessDataset(true);
     } catch (error) {
       console.log(JSON.stringify(error.message));
       console.error("Download failed", error);

@@ -14,7 +14,7 @@ const failedKey = "FAILED-";
 
 declare global {
   interface Window {
-    ethereum?: any;
+    ethereum: any;
   }
 }
 
