@@ -124,11 +124,7 @@ const DatasetItem = ({ dataset }) => {
       await litNodeClient.connect();
       const message = dataset.id;
       const signature = await signDataSetId(message);
-      try {
-        await mintCapacityNFT();
-      } catch (error) {
-        console.log(error);
-      }
+
       const sessionResponse = await axios.post("/api/lit-session", {
         signature,
         message,
@@ -137,7 +133,17 @@ const DatasetItem = ({ dataset }) => {
         ciphertext,
         dataToEncryptHash,
       });
-      const { sessionSigs, decryptedString } = sessionResponse.data;
+      const { sessionSigs, decryptedString, capacityDelegationAuthSig } =
+        sessionResponse.data;
+
+      try {
+        await mintCapacityNFT({
+          capacityDelegationAuthSig,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+
       setCsvData(decryptedString);
       const rows = decryptedString.split("\n");
       console.log(`Rows: ${rows[0]}`);

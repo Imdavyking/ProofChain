@@ -48,7 +48,8 @@ export const getSessionSigs = async (req: Request, res: Response) => {
       return;
     }
     if (canAccess) {
-      const sessionSigs = await mintCapacityNFT(userAddress);
+      const { sessionSignatures: sessionSigs, capacityDelegationAuthSig } =
+        await mintCapacityNFT(userAddress);
       const litNodeClient = new LitJsSdk.LitNodeClient({
         litNetwork: LIT_NETWORK.DatilTest,
         debug: false,
@@ -68,6 +69,7 @@ export const getSessionSigs = async (req: Request, res: Response) => {
         message: "User has access to this dataset",
         sessionSigs,
         decryptedString,
+        capacityDelegationAuthSig,
       });
     }
   } catch (error) {

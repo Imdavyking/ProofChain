@@ -93,8 +93,9 @@ export const mintCapacityNFT = async (userAddress: string) => {
     console.log(
       `✅ Got Session Sigs via an Auth Sig ${JSON.stringify(sessionSignatures)}`
     );
-    return sessionSignatures;
+    return { sessionSignatures, capacityDelegationAuthSig };
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };

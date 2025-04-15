@@ -3,15 +3,22 @@ import { LitContracts } from "@lit-protocol/contracts-sdk";
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { ethers } from "ethers";
 import {
+  AuthSig,
   LitAccessControlConditionResource,
+  LitActionResource,
   createSiweMessage,
   generateAuthSig,
 } from "@lit-protocol/auth-helpers";
 import { getSigner, switchOrAddChain } from "./blockchain.services";
-import { LIT_PROTOCOL_IDENTIFIER } from "../utils/constants";
+import { CHAIN_ID, LIT_PROTOCOL_IDENTIFIER } from "../utils/constants";
 import { ethers as ethersv5 } from "ethers-v5";
+import { SiweMessage } from "siwe";
 
-export const mintCapacityNFT = async () => {
+export const mintCapacityNFT = async ({
+  capacityDelegationAuthSig,
+}: {
+  capacityDelegationAuthSig: AuthSig;
+}) => {
   try {
     const signer = await getSigner();
     await switchOrAddChain(signer.provider, 175188);
@@ -32,38 +39,6 @@ export const mintCapacityNFT = async () => {
 
     console.log({ ethersSigner });
 
-    console.log("🔄 Connecting LitContracts client to network...");
-    const litContracts = new LitContracts({
-      signer: ethersSigner,
-      network: LIT_NETWORK.DatilTest,
-      debug: false,
-    });
-    await litContracts.connect();
-    console.log("✅ Connected LitContracts client to network");
-
-    let capacityTokenId;
-
-    if (!capacityTokenId) {
-      console.log("🔄 Minting Capacity Credits NFT...");
-      capacityTokenId = (
-        await litContracts.mintCapacityCreditsNFT({
-          requestsPerKilosecond: 10,
-          daysUntilUTCMidnightExpiration: 1,
-        })
-      ).capacityTokenIdStr;
-      console.log(`✅ Minted new Capacity Credit with ID: ${capacityTokenId}`);
-    }
-
-    console.log("🔄 Creating capacityDelegationAuthSig...");
-    const { capacityDelegationAuthSig } =
-      await litNodeClient.createCapacityDelegationAuthSig({
-        dAppOwnerWallet: ethersSigner,
-        capacityTokenId,
-        delegateeAddresses: [await ethersSigner.getAddress()],
-        uses: "1",
-      });
-    console.log(`✅ Created the capacityDelegationAuthSig`);
-
     console.log("🔄 Getting Session Sigs via an Auth Sig...");
     const sessionSigs = await litNodeClient.getSessionSigs({
       chain: LIT_PROTOCOL_IDENTIFIER,
@@ -75,24 +50,53 @@ export const mintCapacityNFT = async () => {
           ability: LIT_ABILITY.AccessControlConditionDecryption,
         },
       ],
-      authNeededCallback: async ({
-        uri,
-        expiration,
-        resourceAbilityRequests,
-      }) => {
-        const toSign = await createSiweMessage({
+      authNeededCallback: async ({ uri, expiration, resources }) => {
+        const litResource = new LitActionResource("*");
+
+        const recapObject =
+          await litNodeClient.generateSessionCapabilityObjectWithWildcards([
+            litResource,
+          ]);
+
+        recapObject.addCapabilityForResource(
+          litResource,
+          LIT_ABILITY.LitActionExecution
+        );
+
+        const verified = recapObject.verifyCapabilitiesForResource(
+          litResource,
+          LIT_ABILITY.LitActionExecution
+        );
+
+        if (!verified) {
+          throw new Error("Failed to verify capabilities for resource");
+        }
+
+        let nonce = await litNodeClient.getLatestBlockhash();
+        let siweMessage = new SiweMessage({
+          address: await ethersSigner.getAddress(),
+          statement: "Some custom statement.", // configure to what ever you would like
           uri,
-          expiration,
-          resources: resourceAbilityRequests,
-          walletAddress: await ethersSigner.getAddress(),
-          nonce: await litNodeClient.getLatestBlockhash(),
-          litNodeClient,
+          version: "1",
+          chainId: +Number(CHAIN_ID),
+          expirationTime: expiration,
+          resources,
+          nonce,
         });
 
-        return await generateAuthSig({
-          signer: ethersSigner,
-          toSign,
-        });
+        siweMessage = recapObject.addToSiweMessage(siweMessage);
+
+        const messageToSign = siweMessage.prepareMessage();
+        const signature = await ethersSigner.signMessage(messageToSign);
+
+        const authSig = {
+          sig: signature,
+          derivedVia: "web3.eth.personal.sign",
+          signedMessage: messageToSign,
+          address: await ethersSigner.getAddress(),
+        };
+
+        return authSig;
       },
     });
     console.log(
