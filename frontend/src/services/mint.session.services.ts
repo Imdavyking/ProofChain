@@ -23,7 +23,7 @@ export const mintCapacityNFT = async () => {
     });
     console.log("🔄 Connecting LitNodeClient to Lit network...");
     const litNodeClient = new LitJsSdk.LitNodeClient({
-      litNetwork: LIT_NETWORK.DatilDev,
+      litNetwork: LIT_NETWORK.DatilTest,
       debug: false,
     });
     await litNodeClient.connect();
@@ -34,7 +34,7 @@ export const mintCapacityNFT = async () => {
     console.log("🔄 Connecting LitContracts client to network...");
     const litContracts = new LitContracts({
       signer: ethersSigner,
-      network: LIT_NETWORK.DatilDev,
+      network: LIT_NETWORK.DatilTest,
       debug: false,
     });
     await litContracts.connect();
