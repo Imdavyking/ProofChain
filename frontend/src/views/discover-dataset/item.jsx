@@ -282,21 +282,23 @@ const DatasetItem = ({ dataset }) => {
               </button>
             </div>
           )}
-          <button
-            className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            onClick={canAccessDataset ? useDataSet : purchaseAccessOnChain}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <FaSpinner className="animate-spin text-2xl" />
-              </div>
-            ) : canAccessDataset ? (
-              "Use Dataset"
-            ) : (
-              `Access Dataset ${dataset.priceIntFIL} tFIL`
-            )}
-          </button>
+          {!csvData && (
+            <button
+              className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              onClick={canAccessDataset ? useDataSet : purchaseAccessOnChain}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <FaSpinner className="animate-spin text-2xl" />
+                </div>
+              ) : canAccessDataset ? (
+                "Use Dataset"
+              ) : (
+                `Access Dataset ${dataset.priceIntFIL} tFIL`
+              )}
+            </button>
+          )}
           {csvData && (
             <button
               className="mt-4 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
