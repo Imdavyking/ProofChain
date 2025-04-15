@@ -48,7 +48,7 @@ export const getSessionSigs = async (req: Request, res: Response) => {
       return;
     }
     if (canAccess) {
-      const sessionSigs = await mintCapacityNFT();
+      const sessionSigs = await mintCapacityNFT(userAddress);
       const litNodeClient = new LitJsSdk.LitNodeClient({
         litNetwork: LIT_NETWORK.DatilTest,
         debug: false,

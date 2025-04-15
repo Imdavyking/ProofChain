@@ -9,7 +9,7 @@ import {
   generateAuthSig,
 } from "@lit-protocol/auth-helpers";
 
-export const mintCapacityNFT = async () => {
+export const mintCapacityNFT = async (userAddress: string) => {
   try {
     const ethersSigner = new ethers.Wallet(
       environment.PRIVATE_KEY,
@@ -54,7 +54,7 @@ export const mintCapacityNFT = async () => {
       await litNodeClient.createCapacityDelegationAuthSig({
         dAppOwnerWallet: ethersSigner,
         capacityTokenId,
-        delegateeAddresses: [ethersSigner.address],
+        delegateeAddresses: [userAddress],
         uses: "1",
       });
     console.log(`✅ Created the capacityDelegationAuthSig`);

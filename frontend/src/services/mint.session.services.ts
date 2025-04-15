@@ -7,14 +7,15 @@ import {
   createSiweMessage,
   generateAuthSig,
 } from "@lit-protocol/auth-helpers";
-import { getSigner } from "./blockchain.services";
+import { getSigner, switchOrAddChain } from "./blockchain.services";
 import { LIT_PROTOCOL_IDENTIFIER } from "../utils/constants";
 import { ethers as ethersv5 } from "ethers-v5";
 
 export const mintCapacityNFT = async () => {
   try {
+    const signer = await getSigner();
+    await switchOrAddChain(signer.provider, 175188);
     const provider = new ethersv5.providers.Web3Provider(window.ethereum);
-
     await provider.send("eth_requestAccounts", []);
     const ethersSigner = provider.getSigner();
 

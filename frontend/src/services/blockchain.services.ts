@@ -20,7 +20,7 @@ declare global {
 
 const datasetMarketPlaceAbi = new ethers.Interface(datasetAbi);
 
-async function switchOrAddChain(
+export async function switchOrAddChain(
   ethProvider: ethers.JsonRpcApiProvider,
   switchChainId: string | number
 ) {
@@ -50,23 +50,60 @@ async function switchOrAddChain(
 
       if (error.code === 4902) {
         console.log(`Chain ${targetChainId} not found. Attempting to add.`);
+        const yellowStoneChainId = 175188;
+        const configuredChains = {
+          [CHAIN_ID]: {
+            chainName: CHAIN_NAME,
+            nativeCurrency: {
+              name: CURRENCY_NAME,
+              symbol: CHAIN_SYMBOL,
+              decimals: 18,
+            },
+            rpcUrls: [RPC_URL],
+            blockExplorerUrls: [BLOCK_EXPLORER_URL],
+          },
+          [yellowStoneChainId]: {
+            chainName: "Chronicle Yellowstone - Lit Protocol Testnet",
+            nativeCurrency: {
+              name: "tstLPX",
+              symbol: "tstLPX",
+              decimals: 18,
+            },
+            rpcUrls: ["https://yellowstone-rpc.litprotocol.com/"],
+            blockExplorerUrls: [
+              "https://yellowstone-explorer.litprotocol.com/",
+            ],
+          },
+        };
 
-        if (targetChainId === Number(CHAIN_ID)) {
+        console.log(`Configured chains:`, configuredChains);
+
+        if (configuredChains[chainIdHex]) {
           await ethProvider.provider.send("wallet_addEthereumChain", [
             {
               chainId: chainIdHex,
-              chainName: CHAIN_NAME,
-              nativeCurrency: {
-                name: CURRENCY_NAME,
-                symbol: CHAIN_SYMBOL,
-                decimals: 18,
-              },
-              rpcUrls: [RPC_URL],
-              blockExplorerUrls: [BLOCK_EXPLORER_URL],
+              ...configuredChains[chainIdHex],
             },
           ]);
-          console.log(`${CHAIN_NAME} added and switched`);
+          console.log(`Added and switched to ${targetChainId}`);
         }
+
+        // if (targetChainId === Number(CHAIN_ID)) {
+        //   await ethProvider.provider.send("wallet_addEthereumChain", [
+        //     {
+        //       chainId: chainIdHex,
+        //       chainName: CHAIN_NAME,
+        //       nativeCurrency: {
+        //         name: CURRENCY_NAME,
+        //         symbol: CHAIN_SYMBOL,
+        //         decimals: 18,
+        //       },
+        //       rpcUrls: [RPC_URL],
+        //       blockExplorerUrls: [BLOCK_EXPLORER_URL],
+        //     },
+        //   ]);
+        //   console.log(`${CHAIN_NAME} added and switched`);
+        // }
       } else {
         console.error(`Failed to switch to ${targetChainId}:`, error);
       }
