@@ -92,6 +92,11 @@ def train():
         return jsonify({"message": "Model trained successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+# Endpoint for / hello world
+@app.route('/')
+def hello():
+    return "Hello, World!"
 
 # Endpoint for making predictions
 @app.route('/predict', methods=['POST'])
