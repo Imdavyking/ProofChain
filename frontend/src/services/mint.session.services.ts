@@ -12,7 +12,7 @@ import {
 import { getSigner, switchOrAddChain } from "./blockchain.services";
 import { CHAIN_ID, LIT_PROTOCOL_IDENTIFIER } from "../utils/constants";
 import { ethers as ethersv5 } from "ethers-v5";
-import { SiweMessage } from "siwe";
+import { SiweMessage } from 'siwe';
 
 export const mintCapacityNFT = async ({
   capacityDelegationAuthSig,
@@ -36,8 +36,6 @@ export const mintCapacityNFT = async ({
     });
     await litNodeClient.connect();
     console.log("✅ Connected LitNodeClient to Lit network");
-
-    console.log({ ethersSigner });
 
     console.log("🔄 Getting Session Sigs via an Auth Sig...");
     const sessionSigs = await litNodeClient.getSessionSigs({
@@ -73,7 +71,9 @@ export const mintCapacityNFT = async ({
         }
 
         let nonce = await litNodeClient.getLatestBlockhash();
+        
         let siweMessage = new SiweMessage({
+          domain: window.location.host,
           address: await ethersSigner.getAddress(),
           statement: "Some custom statement.", // configure to what ever you would like
           uri,
@@ -99,6 +99,7 @@ export const mintCapacityNFT = async ({
         return authSig;
       },
     });
+
     console.log(
       `✅ Got Session Sigs via an Auth Sig ${JSON.stringify(sessionSigs)}`
     );

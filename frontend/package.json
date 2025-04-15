@@ -27,7 +27,7 @@
     "react-router-dom": "^7.5.0",
     "react-toastify": "^11.0.5",
     "rollup-plugin-polyfill-node": "^0.13.0",
-    "siwe": "^3.0.0",
+    "siwe": "2.3.2",
     "socket.io-client": "^4.8.1",
     "vite-plugin-node-polyfills": "^0.23.0"
   },
