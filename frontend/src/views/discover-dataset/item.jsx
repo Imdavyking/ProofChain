@@ -14,7 +14,7 @@ import axios from "../../services/axios.config.services.ts";
 import axiosRequest, { AxiosError } from "axios";
 import { signDataSetId } from "../../services/dataset.signature.services.ts";
 import { LIT_PROTOCOL_IDENTIFIER, ML_URL } from "../../utils/constants.js";
-import { mintCapacityNFT } from "../../services/mint.session.services.ts";
+import { getSignatureSession } from "../../services/get.session.services.ts";
 
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
@@ -137,9 +137,10 @@ const DatasetItem = ({ dataset }) => {
         sessionResponse.data;
 
       try {
-        await mintCapacityNFT({
+        const { sessionSigs } = await getSignatureSession({
           capacityDelegationAuthSig,
         });
+        console.log({ sessionSigs });
       } catch (error) {
         console.log(error);
       }

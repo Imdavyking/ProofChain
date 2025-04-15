@@ -14,7 +14,7 @@ import { CHAIN_ID, LIT_PROTOCOL_IDENTIFIER } from "../utils/constants";
 import { ethers as ethersv5 } from "ethers-v5";
 import { SiweMessage } from "siwe";
 
-export const mintCapacityNFT = async ({
+export const getSignatureSession = async ({
   capacityDelegationAuthSig,
 }: {
   capacityDelegationAuthSig: AuthSig;
