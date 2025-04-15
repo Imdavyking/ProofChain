@@ -126,7 +126,9 @@ const DatasetItem = ({ dataset }) => {
       const signature = await signDataSetId(message);
       try {
         await mintCapacityNFT();
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
       const sessionResponse = await axios.post("/api/lit-session", {
         signature,
         message,
