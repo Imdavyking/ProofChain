@@ -17,10 +17,6 @@ export const getSessionSigs = async (req: Request, res: Response) => {
     const {
       signature,
       message: datasetId,
-      evmContractConditions,
-      chain,
-      ciphertext,
-      dataToEncryptHash,
     } = req.body;
     const messageHash = ethers.solidityPackedKeccak256(
       ["uint256"],
@@ -48,27 +44,15 @@ export const getSessionSigs = async (req: Request, res: Response) => {
       return;
     }
     if (canAccess) {
-      const { sessionSignatures: sessionSigs, capacityDelegationAuthSig } =
-        await mintCapacityNFT(userAddress);
+      const { capacityDelegationAuthSig } = await mintCapacityNFT(userAddress);
       const litNodeClient = new LitJsSdk.LitNodeClient({
         litNetwork: LIT_NETWORK.DatilTest,
         debug: false,
       });
       await litNodeClient.connect();
-      const decryptedString = await decryptToString(
-        {
-          ciphertext,
-          sessionSigs,
-          evmContractConditions,
-          chain,
-          dataToEncryptHash,
-        },
-        litNodeClient
-      );
+
       res.status(200).json({
         message: "User has access to this dataset",
-        sessionSigs,
-        decryptedString,
         capacityDelegationAuthSig,
       });
     }

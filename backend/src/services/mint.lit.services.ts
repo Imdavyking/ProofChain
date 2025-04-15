@@ -59,41 +59,7 @@ export const mintCapacityNFT = async (userAddress: string) => {
       });
     console.log(`✅ Created the capacityDelegationAuthSig`);
 
-    console.log("🔄 Getting Session Sigs via an Auth Sig...");
-    const sessionSignatures = await litNodeClient.getSessionSigs({
-      chain: environment.LIT_PROTOCOL_IDENTIFIER,
-      expiration: new Date(Date.now() + 1000 * 60 * 10).toISOString(), // 10 minutes
-      capabilityAuthSigs: [capacityDelegationAuthSig],
-      resourceAbilityRequests: [
-        {
-          resource: new LitAccessControlConditionResource("*"),
-          ability: LIT_ABILITY.AccessControlConditionDecryption,
-        },
-      ],
-      authNeededCallback: async ({
-        uri,
-        expiration,
-        resourceAbilityRequests,
-      }) => {
-        const toSign = await createSiweMessage({
-          uri,
-          expiration,
-          resources: resourceAbilityRequests,
-          walletAddress: await ethersSigner.getAddress(),
-          nonce: await litNodeClient.getLatestBlockhash(),
-          litNodeClient,
-        });
-
-        return await generateAuthSig({
-          signer: ethersSigner,
-          toSign,
-        });
-      },
-    });
-    console.log(
-      `✅ Got Session Sigs via an Auth Sig ${JSON.stringify(sessionSignatures)}`
-    );
-    return { sessionSignatures, capacityDelegationAuthSig };
+    return { capacityDelegationAuthSig };
   } catch (error) {
     console.log(error);
     throw error;

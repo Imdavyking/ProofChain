@@ -15,6 +15,7 @@ import axiosRequest, { AxiosError } from "axios";
 import { signDataSetId } from "../../services/dataset.signature.services.ts";
 import { LIT_PROTOCOL_IDENTIFIER, ML_URL } from "../../utils/constants.js";
 import { getSignatureSession } from "../../services/get.session.services.ts";
+import { encryptString, decryptToString } from "@lit-protocol/encryption";
 
 const DatasetItem = ({ dataset }) => {
   const [canAccessDataset, setCanAccessDataset] = useState(false);
@@ -133,17 +134,21 @@ const DatasetItem = ({ dataset }) => {
         ciphertext,
         dataToEncryptHash,
       });
-      const { sessionSigs, decryptedString, capacityDelegationAuthSig } =
-        sessionResponse.data;
+      const { capacityDelegationAuthSig } = sessionResponse.data;
+      const { sessionSigs } = await getSignatureSession({
+        capacityDelegationAuthSig,
+      });
 
-      try {
-        const { sessionSigs } = await getSignatureSession({
-          capacityDelegationAuthSig,
-        });
-        console.log({ sessionSigs });
-      } catch (error) {
-        console.log(error);
-      }
+      const decryptedString = await decryptToString(
+        {
+          ciphertext,
+          sessionSigs,
+          evmContractConditions,
+          ,
+          dataToEncryptHash,
+        },
+        litNodeClient
+      );
 
       setCsvData(decryptedString);
       const rows = decryptedString.split("\n");
