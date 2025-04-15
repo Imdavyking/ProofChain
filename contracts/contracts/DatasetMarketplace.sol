@@ -74,6 +74,7 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
     error DatasetMarketplace__PaymentFailed();
     error DatasetMarketplace__InvalidSignature();
     error DatasetMarketplace__DatasetNotEncrypted();
+    error DatasetMarketplace__BlockNumberAlreadyPass();
 
     address public constant backendSigAddress =
         address(0x38dAFB5A3f0aBE1F4e3F45162B480142Aae29d38);
@@ -92,6 +93,10 @@ contract DatasetMarketplace is ReentrancyGuard, AbstractBlocklockReceiver {
         uint256 decryptionBlockNumber,
         TypesLib.Ciphertext calldata ciphertext
     ) external {
+        if (block.number > decryptionBlockNumber) {
+            revert DatasetMarketplace__BlockNumberAlreadyPass();
+        }
+
         Dataset memory dataset = Dataset({
             owner: msg.sender,
             cid: "",
