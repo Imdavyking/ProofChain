@@ -144,7 +144,7 @@ const DatasetItem = ({ dataset }) => {
           ciphertext,
           sessionSigs,
           evmContractConditions,
-          chain,
+          chain: LIT_PROTOCOL_IDENTIFIER,
           dataToEncryptHash,
         },
         litNodeClient
