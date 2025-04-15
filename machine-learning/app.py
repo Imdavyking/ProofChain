@@ -94,7 +94,7 @@ def train():
         return jsonify({"error": str(e)}), 400
     
 # Endpoint for / hello world
-@app.route('/')
+@app.route('/',methods=['GET'])
 def hello():
     return "Hello, World!"
 
