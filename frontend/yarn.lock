@@ -1131,6 +1131,30 @@
     tslib "1.14.1"
     util "0.12.5"
 
+"@lit-protocol/encryption@^7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@lit-protocol/encryption/-/encryption-7.1.0.tgz#df06872ccd7e21eb83fc802e696b8780974f6d5a"
+  integrity sha512-iUzH+4XM+oEZ8kJLTNh8FEJuJLj4hYabKbak6cwh8YFbUkabR/w9ENhp9FXvVDNJDSeEANvIMoVPVdBRjHQtpg==
+  dependencies:
+    "@ethersproject/abstract-provider" "5.7.0"
+    "@ethersproject/contracts" "5.7.0"
+    "@ethersproject/providers" "5.7.2"
+    "@lit-protocol/accs-schemas" "^0.0.24"
+    "@lit-protocol/constants" "7.1.0"
+    "@lit-protocol/contracts" "^0.0.74"
+    "@lit-protocol/logger" "7.1.0"
+    "@lit-protocol/misc" "7.1.0"
+    "@lit-protocol/types" "7.1.0"
+    "@lit-protocol/uint8arrays" "7.1.0"
+    "@openagenda/verror" "^3.1.4"
+    ajv "^8.12.0"
+    bech32 "^2.0.0"
+    depd "^2.0.0"
+    ethers "^5.7.1"
+    siwe "^2.3.2"
+    tslib "1.14.1"
+    util "0.12.5"
+
 "@lit-protocol/lit-node-client-nodejs@7.1.0":
   version "7.1.0"
   resolved "https://registry.npmjs.org/@lit-protocol/lit-node-client-nodejs/-/lit-node-client-nodejs-7.1.0.tgz"
