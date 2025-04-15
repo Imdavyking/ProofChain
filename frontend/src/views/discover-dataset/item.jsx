@@ -67,7 +67,10 @@ const DatasetItem = ({ dataset }) => {
       }
 
       const trimmedInputRow = Object.fromEntries(
-        Object.entries(inputRow).map(([key, value]) => [key.trim(), value])
+        Object.entries(inputRow).map(([key, value]) => [
+          key.trim(),
+          value.trim(),
+        ])
       );
 
       const predict = await axiosRequest.post(`${ML_URL}/predict`, {
