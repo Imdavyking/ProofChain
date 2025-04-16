@@ -50,9 +50,10 @@ export async function switchOrAddChain(
 
       if (error.code === 4902) {
         console.log(`Chain ${targetChainId} not found. Attempting to add.`);
-        const yellowStoneChainId = 175188;
+        const yellowStoneChainId = Number(175188);
+        const mainChainId = Number(CHAIN_ID);
         const configuredChains = {
-          [CHAIN_ID]: {
+          [mainChainId]: {
             chainName: CHAIN_NAME,
             nativeCurrency: {
               name: CURRENCY_NAME,
@@ -78,7 +79,7 @@ export async function switchOrAddChain(
 
         console.log(`Configured chains:`, configuredChains);
 
-        if (configuredChains[chainIdHex]) {
+        if (configuredChains[Number(chainIdHex)]) {
           await ethProvider.provider.send("wallet_addEthereumChain", [
             {
               chainId: chainIdHex,
